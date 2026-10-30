@@ -355,7 +355,7 @@ MonoBehaviour:
   dashSpeed: 8
   dashDistance: 3
   dashDuration: 0.7
-  dashCooldown: 1.5
+  dashCooldown: 0.7
 --- !u!50 &825262846
 Rigidbody2D:
   serializedVersion: 5
@@ -637,6 +637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa25bcaa90c41904e906f29d2dbbebf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UICrosshair
+  rectTransform: {fileID: 0}
 --- !u!114 &1129542922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -917,8 +918,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
   target: {fileID: 825262844}
+  aimPoint: {fileID: 825262844}
   often: {x: 0, y: 0, z: -10}
   smoothTime: 0.15
+  lookAheadStrength: 0.4
+  lookAheadMaxDistance: 1
 --- !u!1 &2010255219
 GameObject:
   m_ObjectHideFlags: 0

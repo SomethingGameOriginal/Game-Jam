@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class UICrosshair : MonoBehaviour
 {
-    private RectTransform rectTransform;
+    public RectTransform rectTransform;
 
     void Start()
     {

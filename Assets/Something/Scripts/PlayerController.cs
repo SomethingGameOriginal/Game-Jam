@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
         move.x = Input.GetAxisRaw("Horizontal");
         move.y = Input.GetAxisRaw("Vertical");
 
-        if (Input.GetKeyDown(KeyCode.Space) && dashCooldownTimer <= 0)
+        if (Input.GetMouseButtonDown(1) && dashCooldownTimer <= 0)
         {
             StartDash();
             return;
