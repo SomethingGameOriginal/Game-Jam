@@ -1,6 +1,5 @@
-using TMPro;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class EnemyChase2D : MonoBehaviour
@@ -10,66 +9,106 @@ public class EnemyChase2D : MonoBehaviour
     [SerializeField] protected float moveSpeed = 3f;
     [SerializeField] private int maxHealth = 3;
 
+    [Header("Обнаружение игрока")]
+    [SerializeField] protected LayerMask playerLayer;
+    [SerializeField, Min(0f)] protected float sightRadius = 8f;
+
+    [Header("Поиск потерянного игрока")]
+    [SerializeField, Min(0f)] protected float searchDuration = 3f;
+    [SerializeField, Min(0f)] protected float searchArrivalDistance = 0.2f;
+
     [Header("Обход препятствий")]
     [SerializeField] protected LayerMask obstacleLayer;
     [SerializeField, Min(0.05f)] protected float obstacleCheckDistance = 1.2f;
     [SerializeField, Min(0.05f)] protected float obstacleRadius = 0.25f;
-    [SerializeField, Range(15f, 120f)] protected float scanAngle = 100f;
-    [SerializeField, Range(3, 31)] protected int scanRays = 15;
+    [SerializeField, Min(0.1f)] protected float wallFollowDuration = 1.2f;
+    [SerializeField, Min(0.05f)] protected float wallProbeDistance = 0.7f;
 
-    [Header("Настройка обхода")]
-    [SerializeField, Min(0f)] private float wallFollowTime = 0.5f;
-    [SerializeField, Min(0f)] private float progressWeight = 1f;
-    [SerializeField] private bool drawObstacleLines = true;
+    [Header("Дистанция между врагами")]
+    [SerializeField, Min(0f)] protected float enemySpacing = 1.2f;
+    [SerializeField] protected LayerMask enemyLayer;
+    [SerializeField, Min(0f)] protected float separationWeight = 2f;
 
-    private float wallFollowTimer;
-    private float wallSide;
-    private Vector2 debugDesired;
-    private Vector2 debugChosen;
-    private readonly System.Collections.Generic.List<Vector2> debugBlocked = new();
-    private readonly System.Collections.Generic.List<Vector2> debugClear = new();
-    [Header("Расширенный поиск")]
-    [SerializeField, Range(0f, 1f)] private float sideBias = 0.3f;
-    [SerializeField] private float stuckTimeToReverse = 0.6f;
-
-    [Header("Отладка обхода")]
-    [SerializeField] private bool showObstacleGizmos = true;
-    [SerializeField] private bool showAllScanLines = true;
-
-    private Vector2 debugDesiredDirection;
-    private Vector2 debugChosenDirection;
-    private readonly System.Collections.Generic.List<Vector2> debugBlockedDirections = new();
-    private readonly System.Collections.Generic.List<Vector2> debugClearDirections = new();
-
-    // Добавь рядом с полями обхода
-    private bool followingWall;
-
-    [SerializeField, Min(0.1f)] private float wallFollowDuration = 1.2f;
-    [SerializeField, Min(0.1f)] private float wallProbeDistance = 0.7f;
-    [SerializeField, Range(0f, 1f)] private float wallClearance = 0.35f;
+    [Header("Отладка")]
+    [SerializeField] private bool showGizmos = true;
 
     protected Rigidbody2D rb;
     protected Vector2 lastDirection;
+    protected Vector2 LastKnownPlayerPosition { get; private set; }
+
+    protected bool HasPlayer => player != null;
+    protected bool IsSearchingForPlayer => searchTimer > 0f;
+
+    protected Vector2 PlayerPosition =>
+        player != null ? (Vector2)player.position : LastKnownPlayerPosition;
+
+    private bool followingWall;
+    private float wallFollowTimer;
+    private float wallSide;
+    private bool preferLeft = true;
 
     private Vector2 previousPosition;
     private float stuckTimer;
-    private bool preferLeft = true;
+    private float searchTimer;
 
-    [Header("Обнаружение игрока")]
-    [SerializeField] protected LayerMask playerLayer;
-    [SerializeField] protected float sightRadius = 8f;
+    private readonly List<Vector2> debugBlocked = new();
+    private readonly List<Vector2> debugClear = new();
+    private Vector2 debugDesired;
+    private Vector2 debugChosen;
 
-    [Header("Дистанция между врагами")]
-    [SerializeField] protected float enemySpacing = 1.2f;
-    [SerializeField] protected LayerMask enemyLayer;
+    protected virtual void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        previousPosition = rb.position;
+        LastKnownPlayerPosition = rb.position;
 
+        if (player == null)
+        {
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+            if (playerObject != null)
+                player = playerObject.transform;
+        }
+
+        if (player != null)
+            LastKnownPlayerPosition = player.position;
+    }
+
+    protected virtual void FixedUpdate()
+    {
+        UpdateStuckTimer();
+
+        if (FindPlayer())
+        {
+            MoveInDirection(GetMoveDirection(PlayerPosition));
+            return;
+        }
+
+        UpdateSearchMovement();
+    }
+
+    /// <summary>
+    /// Проверяет, обнаружен ли игрок в пределах sightRadius.
+    /// При потере игрока запоминает его последнюю позицию.
+    /// </summary>
     protected bool FindPlayer()
     {
         if (player != null)
-            return Vector2.Distance(transform.position, player.position) <= sightRadius;
+        {
+            LastKnownPlayerPosition = player.position;
+
+            if (Vector2.Distance(rb.position, LastKnownPlayerPosition) <= sightRadius)
+                return true;
+
+            player = null;
+            searchTimer = searchDuration;
+        }
+
+        if (playerLayer.value == 0)
+            return false;
 
         Collider2D hit = Physics2D.OverlapCircle(
-            transform.position,
+            rb.position,
             sightRadius,
             playerLayer
         );
@@ -80,88 +119,81 @@ public class EnemyChase2D : MonoBehaviour
         PlayerStats stats = hit.GetComponentInParent<PlayerStats>();
         player = stats != null ? stats.transform : hit.transform;
 
+        if (player == null)
+            return false;
+
+        LastKnownPlayerPosition = player.position;
+        searchTimer = 0f;
         return true;
     }
 
-    protected Vector2 GetSpacingDirection()
+    /// <summary>
+    /// Идёт к последней известной позиции игрока после его потери.
+    /// По прибытии некоторое время ищет игрока, затем прекращает движение.
+    /// </summary>
+    protected void UpdateSearchMovement()
     {
-        Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(
-            transform.position,
-            enemySpacing,
-            enemyLayer
-        );
-
-        Vector2 direction = Vector2.zero;
-
-        foreach (Collider2D enemy in nearbyEnemies)
+        if (searchTimer <= 0f)
         {
-            if (enemy == null || enemy.transform == transform)
-                continue;
-
-            Vector2 away = (Vector2)transform.position - (Vector2)enemy.transform.position;
-            float distance = away.magnitude;
-
-            if (distance > 0.001f)
-                direction += away.normalized / distance;
+            StopMoving();
+            return;
         }
 
-        return direction.sqrMagnitude > 0.001f
-            ? direction.normalized
-            : Vector2.zero;
-    }
+        Vector2 toLastPosition = LastKnownPlayerPosition - rb.position;
 
-    protected void DrawEnemyGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, sightRadius);
-
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, enemySpacing);
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        DrawEnemyGizmos();
-
-        if (!drawObstacleLines)
+        if (toLastPosition.magnitude > searchArrivalDistance)
+        {
+            MoveInDirection(GetMoveDirection(LastKnownPlayerPosition));
             return;
+        }
 
-        Vector3 origin = Application.isPlaying && rb != null
-            ? (Vector3)rb.position
-            : transform.position;
-
-        Gizmos.color = Color.red;
-        foreach (Vector2 dir in debugBlocked)
-            Gizmos.DrawLine(origin, origin + (Vector3)(dir * obstacleCheckDistance));
-
-        Gizmos.color = Color.green;
-        foreach (Vector2 dir in debugClear)
-            Gizmos.DrawLine(origin, origin + (Vector3)(dir * obstacleCheckDistance));
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(origin, origin + (Vector3)(debugDesired * obstacleCheckDistance));
-
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawLine(origin, origin + (Vector3)(debugChosen * obstacleCheckDistance));
+        StopMoving();
+        searchTimer -= Time.fixedDeltaTime;
     }
 
-    protected virtual void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        previousPosition = rb.position;
-    }
-
-    protected virtual void FixedUpdate()
-    {
-        UpdateStuckTimer();
-    }
-
+    /// <summary>
+    /// Направление к цели с учётом дистанции до союзников и препятствий.
+    /// </summary>
     protected Vector2 GetMoveDirection(Vector2 targetPosition)
     {
-        Vector2 toTarget = targetPosition - (Vector2)transform.position;
+        Vector2 toTarget = targetPosition - rb.position;
+
+        if (toTarget.sqrMagnitude < 0.001f)
+            return Vector2.zero;
+
+        Vector2 desired = toTarget.normalized;
+        Vector2 separation = GetSeparationDirection();
+
+        if (separation.sqrMagnitude > 0.001f)
+            desired = (desired + separation * separationWeight).normalized;
+
+        return FindDirection(desired);
+    }
+
+    /// <summary>
+    /// Направление для отступления от цели с учётом союзников и препятствий.
+    /// </summary>
+    protected Vector2 GetRetreatDirection(Vector2 awayFromTarget)
+    {
+        if (awayFromTarget.sqrMagnitude < 0.001f)
+            return Vector2.zero;
+
+        Vector2 desired = awayFromTarget.normalized;
+        Vector2 separation = GetSeparationDirection();
+
+        if (separation.sqrMagnitude > 0.001f)
+            desired = (desired + separation * separationWeight).normalized;
+
+        return FindDirection(desired);
+    }
+
+    protected Vector2 GetSeparationDirection()
+    {
+        if (rb == null || enemySpacing <= 0f || enemyLayer.value == 0)
+            return Vector2.zero;
 
         Collider2D[] nearby = Physics2D.OverlapCircleAll(
-            transform.position,
+            rb.position,
             enemySpacing,
             enemyLayer
         );
@@ -173,39 +205,39 @@ public class EnemyChase2D : MonoBehaviour
             if (other == null || other.transform == transform)
                 continue;
 
-            Vector2 away = (Vector2)transform.position - (Vector2)other.bounds.center;
+            Vector2 away = rb.position - (Vector2)other.bounds.center;
             float distance = away.magnitude;
 
-            if (distance > 0.001f)
-                separation += away.normalized * (enemySpacing - distance) / enemySpacing;
+            if (distance > 0.001f && distance < enemySpacing)
+            {
+                separation += away.normalized *
+                              ((enemySpacing - distance) / enemySpacing);
+            }
         }
 
-        // Увеличивай separationWeight, если враги всё ещё слишком близко.
-        const float separationWeight = 2f;
-        Vector2 desired = toTarget.normalized + separation * separationWeight;
-
-        return desired.sqrMagnitude > 0.001f ? desired.normalized : Vector2.zero;
+        return separation.sqrMagnitude > 0.001f
+            ? separation.normalized
+            : Vector2.zero;
     }
 
-    /// <summary>Направление к цели с учётом препятствий.</summary>
+    /// <summary>
+    /// Обход препятствий без учёта дистанции до других врагов.
+    /// Оставлен для совместимости с другими дочерними классами.
+    /// </summary>
     protected Vector2 GetDirectionTo(Vector2 target)
     {
         Vector2 offset = target - rb.position;
 
-        if (offset.sqrMagnitude < 0.001f)
-            return Vector2.zero;
-
-        Vector2 result = FindDirection(offset);
-        Debug.Log($"Выбранное направление: {result}");
-        return result;
+        return offset.sqrMagnitude > 0.001f
+            ? FindDirection(offset.normalized)
+            : Vector2.zero;
     }
 
-    /// <summary>Движение в направлении с учётом скорости.</summary>
     protected void MoveInDirection(Vector2 direction)
     {
         if (direction.sqrMagnitude < 0.001f)
         {
-            rb.linearVelocity = Vector2.zero;
+            StopMoving();
             return;
         }
 
@@ -215,24 +247,12 @@ public class EnemyChase2D : MonoBehaviour
 
     protected void StopMoving()
     {
-        rb.linearVelocity = Vector2.zero;
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
     }
 
-    protected bool HasPlayer => player != null;
-    protected Vector2 PlayerPosition => player != null
-        ? (Vector2)player.position
-        : rb.position;
-
-    /// <summary>Вызывай из урона, чтобы уничтожать врага при нулевом HP.</summary>
-    public virtual void TakeDamage(int damage)
-    {
-        maxHealth -= damage;
-
-        if (maxHealth <= 0)
-            Destroy(gameObject);
-    }
-
-    public Vector2 FindDirection(Vector2 desired)
+    /// <summary>Выбирает направление движения с обходом препятствий.</summary>
+    protected Vector2 FindDirection(Vector2 desired)
     {
         desired = desired.normalized;
 
@@ -246,7 +266,6 @@ public class EnemyChase2D : MonoBehaviour
 
         bool directBlocked = IsBlocked(desired, obstacleCheckDistance);
 
-        // Если обходили стену и путь к цели снова свободен — заканчиваем обход.
         if (followingWall)
         {
             wallFollowTimer -= Time.fixedDeltaTime;
@@ -255,14 +274,12 @@ public class EnemyChase2D : MonoBehaviour
                 followingWall = false;
         }
 
-        // Прямой путь свободен — идём к цели.
         if (!followingWall && !directBlocked)
         {
             debugChosen = desired;
             return desired;
         }
 
-        // Начинаем обход. Сторона задаётся при первом столкновении.
         if (!followingWall)
         {
             followingWall = true;
@@ -273,24 +290,21 @@ public class EnemyChase2D : MonoBehaviour
 
         Vector2 tangent = new Vector2(-desired.y, desired.x) * wallSide;
 
-        // Продвигаемся вдоль стены и слегка от неё.
         Vector2[] candidates =
         {
-        (tangent + desired * 0.25f).normalized,
-        tangent,
-        (tangent - desired * 0.25f).normalized,
-        (tangent + desired * 0.6f).normalized,
-        (tangent - desired * 0.6f).normalized
-    };
+            (tangent + desired * 0.25f).normalized,
+            tangent,
+            (tangent - desired * 0.25f).normalized,
+            (tangent + desired * 0.6f).normalized,
+            (tangent - desired * 0.6f).normalized
+        };
 
         Vector2 best = Vector2.zero;
         float bestScore = float.NegativeInfinity;
 
         foreach (Vector2 candidate in candidates)
         {
-            bool blocked = IsBlocked(candidate, wallProbeDistance);
-
-            if (blocked)
+            if (IsBlocked(candidate, wallProbeDistance))
             {
                 debugBlocked.Add(candidate);
                 continue;
@@ -298,7 +312,6 @@ public class EnemyChase2D : MonoBehaviour
 
             debugClear.Add(candidate);
 
-            // Сильно предпочитаем движение к цели, но сохраняем движение вдоль стены.
             float score = Vector2.Dot(candidate, desired) * 0.5f
                         + Vector2.Dot(candidate, tangent) * 0.8f;
 
@@ -309,7 +322,6 @@ public class EnemyChase2D : MonoBehaviour
             }
         }
 
-        // Если выбранная сторона упёрлась, пробуем противоположную.
         if (best == Vector2.zero)
         {
             wallSide *= -1f;
@@ -317,10 +329,10 @@ public class EnemyChase2D : MonoBehaviour
 
             Vector2[] oppositeCandidates =
             {
-            (tangent + desired * 0.25f).normalized,
-            tangent,
-            (tangent - desired * 0.25f).normalized
-        };
+                (tangent + desired * 0.25f).normalized,
+                tangent,
+                (tangent - desired * 0.25f).normalized
+            };
 
             foreach (Vector2 candidate in oppositeCandidates)
             {
@@ -338,8 +350,8 @@ public class EnemyChase2D : MonoBehaviour
 
     private bool IsBlocked(Vector2 direction, float distance)
     {
-        if (direction.sqrMagnitude < 0.001f)
-            return true;
+        if (direction.sqrMagnitude < 0.001f || obstacleLayer.value == 0)
+            return false;
 
         RaycastHit2D hit = Physics2D.CircleCast(
             rb.position,
@@ -352,9 +364,10 @@ public class EnemyChase2D : MonoBehaviour
         return hit.collider != null;
     }
 
-    private void UpdateStuckTimer()
+    protected virtual void UpdateStuckTimer()
     {
-        if (rb == null) return;
+        if (rb == null)
+            return;
 
         float moved = Vector2.Distance(rb.position, previousPosition);
 
@@ -362,9 +375,10 @@ public class EnemyChase2D : MonoBehaviour
         {
             stuckTimer += Time.fixedDeltaTime;
 
-            if (stuckTimer >= stuckTimeToReverse)
+            if (stuckTimer >= 0.6f)
             {
                 preferLeft = !preferLeft;
+                followingWall = false;
                 stuckTimer = 0f;
             }
         }
@@ -374,6 +388,14 @@ public class EnemyChase2D : MonoBehaviour
         }
 
         previousPosition = rb.position;
+    }
+
+    public virtual void TakeDamage(int damage)
+    {
+        maxHealth -= damage;
+
+        if (maxHealth <= 0)
+            Destroy(gameObject);
     }
 
     protected static Vector2 Rotate(Vector2 vector, float degrees)
@@ -386,5 +408,54 @@ public class EnemyChase2D : MonoBehaviour
             vector.x * cos - vector.y * sin,
             vector.x * sin + vector.y * cos
         ).normalized;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!showGizmos)
+            return;
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, sightRadius);
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, enemySpacing);
+
+        if (Application.isPlaying)
+        {
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireSphere(LastKnownPlayerPosition, 0.15f);
+            Gizmos.DrawLine(transform.position, LastKnownPlayerPosition);
+        }
+
+        Vector3 origin = Application.isPlaying && rb != null
+            ? (Vector3)rb.position
+            : transform.position;
+
+        Gizmos.color = Color.red;
+        foreach (Vector2 direction in debugBlocked)
+            Gizmos.DrawLine(
+                origin,
+                origin + (Vector3)(direction * obstacleCheckDistance)
+            );
+
+        Gizmos.color = Color.green;
+        foreach (Vector2 direction in debugClear)
+            Gizmos.DrawLine(
+                origin,
+                origin + (Vector3)(direction * obstacleCheckDistance)
+            );
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(
+            origin,
+            origin + (Vector3)(debugDesired * obstacleCheckDistance)
+        );
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawLine(
+            origin,
+            origin + (Vector3)(debugChosen * obstacleCheckDistance)
+        );
     }
 }
