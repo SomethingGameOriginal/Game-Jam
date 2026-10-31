@@ -31,6 +31,6 @@ public class ExitControllRoom : MonoBehaviour
 
         int count = roomCollider.Overlap(filter, objectsInside);
 
-        exit.SetActive(count > 0);
+        exit.SetActive(count > 1);
     }
 }

@@ -50,6 +50,7 @@ public class EnemyChase2D : MonoBehaviour
     private Vector2 previousPosition;
     private float stuckTimer;
     private float searchTimer;
+    private bool wasSeeingPlayer;
 
     private readonly List<Vector2> debugBlocked = new();
     private readonly List<Vector2> debugClear = new();
@@ -65,7 +66,6 @@ public class EnemyChase2D : MonoBehaviour
         if (player == null)
         {
             GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-
             if (playerObject != null)
                 player = playerObject.transform;
         }
@@ -78,31 +78,45 @@ public class EnemyChase2D : MonoBehaviour
     {
         UpdateStuckTimer();
 
-        if (FindPlayer())
+        bool seeing = FindPlayer();
+
+        if (seeing)
         {
-            MoveInDirection(GetMoveDirection(PlayerPosition));
+            LastKnownPlayerPosition = player.position;
+            wasSeeingPlayer = true;
+            searchTimer = 0f;
+            OnPlayerVisible();
             return;
+        }
+
+        // Только что потеряли игрока — запускаем поиск один раз
+        if (wasSeeingPlayer)
+        {
+            searchTimer = searchDuration;
+            wasSeeingPlayer = false;
         }
 
         UpdateSearchMovement();
     }
 
     /// <summary>
-    /// Проверяет, обнаружен ли игрок в пределах sightRadius.
-    /// При потере игрока запоминает его последнюю позицию.
+    /// Что делать, когда игрок виден. Базовая реализация — просто преследование.
+    /// Наследники (например, RangedEnemy) переопределяют под свою тактику.
     /// </summary>
+    protected virtual void OnPlayerVisible()
+    {
+        MoveInDirection(GetMoveDirection(player.position));
+    }
+
     protected bool FindPlayer()
     {
-        if (player != null)
+        if (player != null &&
+            Vector2.Distance(rb.position, player.position) <= sightRadius)
         {
-            LastKnownPlayerPosition = player.position;
-
-            if (Vector2.Distance(rb.position, LastKnownPlayerPosition) <= sightRadius)
-                return true;
-
-            player = null;
-            searchTimer = searchDuration;
+            return true;
         }
+
+        player = null;
 
         if (playerLayer.value == 0)
             return false;
@@ -119,12 +133,7 @@ public class EnemyChase2D : MonoBehaviour
         PlayerStats stats = hit.GetComponentInParent<PlayerStats>();
         player = stats != null ? stats.transform : hit.transform;
 
-        if (player == null)
-            return false;
-
-        LastKnownPlayerPosition = player.position;
-        searchTimer = 0f;
-        return true;
+        return player != null;
     }
 
     /// <summary>
@@ -344,8 +353,54 @@ public class EnemyChase2D : MonoBehaviour
             }
         }
 
+        // ⬇️ КЛЮЧЕВОЙ ФИКС: никогда не возвращаем zero, если цель есть.
+        // Иначе враг «умирает» в углу и уже никогда не раздуплится,
+        // т.к. stuck-timer проверяет только движущегося врага.
+        if (best == Vector2.zero)
+        {
+            best = FindLeastBlockedDirection(desired);
+            followingWall = false; // дадим шанс переоценить ситуацию со след. кадра
+        }
+
         debugChosen = best;
         return best;
+    }
+
+    /// <summary>
+    /// Аварийный выбор направления: 8 проб, берём то, где просвет до стены наибольший.
+    /// Никогда не возвращает Vector2.zero, если desired ненулевой.
+    /// </summary>
+    private Vector2 FindLeastBlockedDirection(Vector2 desired)
+    {
+        Vector2 bestDir = -desired;
+        float bestClearance = -1f;
+
+        for (int i = 0; i < 8; i++)
+        {
+            Vector2 dir = Rotate(desired, i * 45f);
+            float clearance = wallProbeDistance;
+
+            if (obstacleLayer.value != 0)
+            {
+                RaycastHit2D hit = Physics2D.CircleCast(
+                    rb.position,
+                    obstacleRadius,
+                    dir,
+                    wallProbeDistance,
+                    obstacleLayer
+                );
+                if (hit.collider != null)
+                    clearance = hit.distance;
+            }
+
+            if (clearance > bestClearance)
+            {
+                bestClearance = clearance;
+                bestDir = dir;
+            }
+        }
+
+        return bestDir;
     }
 
     private bool IsBlocked(Vector2 direction, float distance)
@@ -371,13 +426,18 @@ public class EnemyChase2D : MonoBehaviour
 
         float moved = Vector2.Distance(rb.position, previousPosition);
 
-        if (rb.linearVelocity.sqrMagnitude > 0.05f && moved < 0.005f)
+        // «Хочет двигаться» определяем по lastDirection — он сохраняется,
+        // даже если текущий FindDirection вернул ноль.
+        bool wantsToMove = lastDirection.sqrMagnitude > 0.001f;
+
+        if (wantsToMove && moved < 0.005f)
         {
             stuckTimer += Time.fixedDeltaTime;
 
             if (stuckTimer >= 0.6f)
             {
                 preferLeft = !preferLeft;
+                wallSide *= -1f;
                 followingWall = false;
                 stuckTimer = 0f;
             }
@@ -396,6 +456,16 @@ public class EnemyChase2D : MonoBehaviour
 
         if (maxHealth <= 0)
             Destroy(gameObject);
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Pistol"))
+        {
+            TakeDamage(10);
+            Debug.Log(maxHealth);
+            Destroy(collision.gameObject);
+        }
     }
 
     protected static Vector2 Rotate(Vector2 vector, float degrees)

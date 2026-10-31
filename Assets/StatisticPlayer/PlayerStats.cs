@@ -14,20 +14,22 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private Text infectionText;
     [SerializeField] private Image infectionBar;
 
+    private float currentMaxHealth;
     private float health;
     private float infection;
     private float infectionTimer;
 
     private void Start()
     {
-        health = maxHealth;
+        currentMaxHealth = maxHealth;
+        health = currentMaxHealth;
         infection = 0f;
         UpdateUI();
     }
 
     private void Update()
     {
-        if (infection >= 100f)
+        if (infection >= 100f || secondsPerIncrease <= 0f)
             return;
 
         infectionTimer += Time.deltaTime;
@@ -48,7 +50,7 @@ public class PlayerStats : MonoBehaviour
 
     public void Heal(float amount)
     {
-        health = Mathf.Min(maxHealth, health + amount);
+        health = Mathf.Min(currentMaxHealth, health + amount);
         UpdateUI();
     }
 
@@ -58,16 +60,37 @@ public class PlayerStats : MonoBehaviour
         UpdateUI();
     }
 
+    public void ModifyMaxHealth(float amount)
+    {
+        currentMaxHealth = Mathf.Max(1f, currentMaxHealth + amount);
+
+        // Если максимум уменьшился ниже текущего здоровья, ограничиваем здоровье.
+        health = Mathf.Min(health, currentMaxHealth);
+        UpdateUI();
+    }
+
+    public void ModifyInfectionRate(float amount)
+    {
+        infectionIncrease = Mathf.Max(0f, infectionIncrease + amount);
+    }
+
+    public void ModifySecondsPerInfection(float amount)
+    {
+        secondsPerIncrease = Mathf.Max(0.1f, secondsPerIncrease + amount);
+    }
+
     private void UpdateUI()
     {
         if (healthText != null)
-            healthText.text = $"Здоровье: {Mathf.CeilToInt(health)} / {Mathf.CeilToInt(maxHealth)}";
+            healthText.text =
+                $"Здоровье: {Mathf.CeilToInt(health)} / {Mathf.CeilToInt(currentMaxHealth)}";
 
         if (infectionText != null)
             infectionText.text = $"Заражение: {Mathf.CeilToInt(infection)}%";
 
         if (healthBar != null)
-            healthBar.fillAmount = maxHealth > 0f ? health / maxHealth : 0f;
+            healthBar.fillAmount =
+                currentMaxHealth > 0f ? health / currentMaxHealth : 0f;
 
         if (infectionBar != null)
             infectionBar.fillAmount = infection / 100f;
