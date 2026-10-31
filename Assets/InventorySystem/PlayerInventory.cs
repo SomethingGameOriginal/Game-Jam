@@ -15,6 +15,8 @@ public class PlayerInventory : MonoBehaviour
     [Header("Выбрасывание")]
     [SerializeField] private float dropDistance = 0.8f;
 
+    [SerializeField] private PistolController pistolController;
+
     private InventoryItem[] items = new InventoryItem[SlotCount];
     private int selectedSlot = -1;
     private GameObject equippedWeapon;
@@ -74,16 +76,35 @@ public class PlayerInventory : MonoBehaviour
             equippedWeapon = null;
         }
 
-        if (!IsValidSelectedSlot() || weaponHolder == null)
+        if (pistolController != null)
+            pistolController.gameObject.SetActive(false);
+
+        if (!IsValidSelectedSlot())
             return;
 
         InventoryItem item = items[selectedSlot];
 
-        if (item != null &&
-            item.type == ItemType.Weapon &&
-            item.weaponPrefab != null)
+        if (item == null || item.type != ItemType.Weapon)
+            return;
+
+        switch (item.weaponId)
         {
-            equippedWeapon = Instantiate(item.weaponPrefab, weaponHolder);
+            case WeaponId.Pistol:
+                if (pistolController != null)
+                {
+                    pistolController.gameObject.SetActive(true);
+                }
+                else if (item.weaponPrefab != null && weaponHolder != null)
+                {
+                    equippedWeapon = Instantiate(item.weaponPrefab, weaponHolder);
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        "Для пистолета назначьте Pistol Controller или Weapon Prefab."
+                    );
+                }
+                break;
         }
     }
 

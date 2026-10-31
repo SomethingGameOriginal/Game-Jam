@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7231182687705730272
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4805995643125058762}
+  - component: {fileID: 5401348564926805204}
+  m_Layer: 0
+  m_Name: WeaponPistolet
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4805995643125058762
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7231182687705730272}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1315.6082, y: 688.49365, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5401348564926805204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7231182687705730272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e783fce1b5435346b0c6f44e6a25dfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryItem
+  itemName: "\u041F\u0438\u0441\u0442\u043E\u043B\u0435\u0442"
+  description: "\u041F\u0438\u0441\u0442\u043E\u043B\u0435\u0442 \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0438
+    \u041E\u041A\u041D\u041E"
+  type: 0
+  icon: {fileID: 4319395737909131107, guid: f1a819dc62fee4845b7d68da801938dc, type: 3}
+  pickupPrefab: {fileID: 7954520041731955131, guid: 6b8fc7e75c423fa4194e805989359c2d, type: 3}
+  weaponId: 1
+  weaponPrefab: {fileID: 7954520041731955131, guid: 0c8641a93d1b42b4991fd5021d4d6843, type: 3}
+  healthRestored: 1

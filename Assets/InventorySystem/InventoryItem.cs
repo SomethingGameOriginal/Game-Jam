@@ -6,6 +6,12 @@ public enum ItemType
     Antidote
 }
 
+public enum WeaponId
+{
+    None,
+    Pistol
+}
+
 public class InventoryItem : MonoBehaviour
 {
     public string itemName;
@@ -17,6 +23,7 @@ public class InventoryItem : MonoBehaviour
     public GameObject pickupPrefab;
 
     [Header("Для оружия")]
+    public WeaponId weaponId;
     public GameObject weaponPrefab;
 
     [Header("Для антидота")]
