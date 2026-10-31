@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
     public float dashDuration; // Длительность
     public float dashCooldown = 1; // Время перезарядки рывка
 
-    bool isDashing = false;
+    public bool isDashing = false;
     float dashTimeLeft; // оставшееся время
     float dashCooldownTimer; // таймер перезарядки рывка
     Vector2 dashDir; // мчится к тебе (так перевёл гугл переводчик)
