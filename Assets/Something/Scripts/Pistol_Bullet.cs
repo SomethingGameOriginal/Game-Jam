@@ -21,9 +21,9 @@ public class Pistol_Bullet : MonoBehaviour
     {
         rb.linearVelocity = direction * speed;
     }
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Wall"))
+        if (collision.CompareTag("Wall"))
         {
             Destroy(gameObject);
         }
