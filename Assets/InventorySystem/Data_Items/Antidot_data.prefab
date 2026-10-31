@@ -51,7 +51,7 @@ MonoBehaviour:
     \u0414\u043E\u0441\u0442\u0443\u043F\u0435\u043D \u043A \u043F\u0440\u0435\u043C\u0438\u043D\u0435\u043D\u0438\u044E
     1 \u0440\u0430\u0437!"
   type: 1
-  icon: {fileID: -2311659948842064771, guid: 597fbe65ed739f34992643b6c7ce864b, type: 3}
+  icon: {fileID: -3975624549204834352, guid: 33a97704ae4f2194c914a62a2a652803, type: 3}
   pickupPrefab: {fileID: 7954520041731955131, guid: 6b8fc7e75c423fa4194e805989359c2d, type: 3}
   weaponPrefab: {fileID: 0}
   healthRestored: 1

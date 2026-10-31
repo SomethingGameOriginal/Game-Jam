@@ -11,25 +11,33 @@ public class RangedEnemy : EnemyChase2D
     [SerializeField] private Transform firePoint;
     [SerializeField] private float fireRate = 1f;
     [SerializeField] private float projectileSpeed = 8f;
+    [SerializeField] private int projectileDamage = 1;
 
     [SerializeField] private LayerMask obstacleLayers;
 
     private float fireTimer;
 
-    private bool HasClearShot()
+    private bool HasClearShot(out Vector2 direction)
     {
         Vector2 origin = firePoint != null
-            ? firePoint.position
-            : transform.position;
+            ? (Vector2)firePoint.position
+            : rb.position;
 
         Vector2 target = PlayerPosition;
-        Vector2 direction = target - origin;
-        float distance = direction.magnitude;
+        Vector2 offset = target - origin;
+
+        if (offset.sqrMagnitude < 0.001f)
+        {
+            direction = Vector2.zero;
+            return false;
+        }
+
+        direction = offset.normalized;
 
         RaycastHit2D hit = Physics2D.Raycast(
             origin,
-            direction.normalized,
-            distance,
+            direction,
+            offset.magnitude,
             obstacleLayers
         );
 
@@ -38,9 +46,10 @@ public class RangedEnemy : EnemyChase2D
 
     protected override void FixedUpdate()
     {
-        base.FixedUpdate();
+        base.FixedUpdate(); // обновляет таймер застревания в EnemyChase2D
 
-        if (!HasPlayer)
+        // Убедись, что EnemyChase2D.Awake() уже нашёл Rigidbody2D.
+        if (!FindPlayer())
         {
             StopMoving();
             return;
@@ -50,18 +59,28 @@ public class RangedEnemy : EnemyChase2D
         float distance = toPlayer.magnitude;
 
         if (distance > desiredDistance + distanceTolerance)
-            MoveInDirection(GetMoveDirection(PlayerPosition));
+        {
+            // Сначала учитываем дистанцию между врагами, затем обход препятствий.
+            Vector2 desiredMove = GetMoveDirection(PlayerPosition);
+            MoveInDirection(FindDirection(desiredMove));
+        }
         else if (distance < desiredDistance - distanceTolerance)
-            MoveInDirection(GetMoveDirection(PlayerPosition));
+        {
+            // Отступаем от игрока, также проверяя препятствия.
+            MoveInDirection(FindDirection(-toPlayer.normalized));
+        }
         else
+        {
             StopMoving();
+        }
 
         fireTimer -= Time.fixedDeltaTime;
 
         if (fireTimer <= 0f)
         {
-            if (HasClearShot())
-                Shoot(GetDirectionTo(PlayerPosition));
+            if (HasClearShot(out Vector2 shotDirection))
+                Shoot(shotDirection);
+
             fireTimer = 1f / Mathf.Max(0.01f, fireRate);
         }
     }
@@ -79,7 +98,7 @@ public class RangedEnemy : EnemyChase2D
         EnemyProjectile bullet = projectile.GetComponent<EnemyProjectile>();
 
         if (bullet != null)
-            bullet.Launch(direction, projectileSpeed, 1);
+            bullet.Launch(direction, projectileSpeed, projectileDamage);
         else
             Debug.LogError("На Projectile Prefab отсутствует EnemyProjectile", projectile);
     }
