@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7231182687705730272
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4805995643125058762}
+  - component: {fileID: 5401348564926805204}
+  m_Layer: 0
+  m_Name: WeaponMP7_data
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4805995643125058762
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7231182687705730272}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1315.6082, y: 688.49365, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5401348564926805204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7231182687705730272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e783fce1b5435346b0c6f44e6a25dfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryItem
+  itemName: MP-7
+  description: "\u0412 \u0441\u0438\u043B\u0443 \u0430\u0432\u0442\u043E\u0440\u0441\u043A\u0438\u0445
+    \u043F\u0440\u0430\u0432, \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0438 \u041E\u041A\u041D\u041E
+    \u043F\u0440\u0438\u0448\u043B\u043E\u0441\u044C \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C
+    \u0441\u0432\u043E\u044E \u0432\u0435\u0440\u0441\u0438\u044E \u0437\u043D\u0430\u043C\u0435\u043D\u0438\u0442\u043E\u0433\u043E
+    \u043F\u0438\u0441\u0442\u043E\u043B\u0435\u0442\u0430-\u043F\u0443\u043B\u0435\u043C\u0435\u0442\u0430"
+  type: 0
+  icon: {fileID: -2311659948842064771, guid: 597fbe65ed739f34992643b6c7ce864b, type: 3}
+  pickupPrefab: {fileID: 7954520041731955131, guid: 6b8fc7e75c423fa4194e805989359c2d, type: 3}
+  weaponPrefab: {fileID: 0}
+  healthRestored: 1
