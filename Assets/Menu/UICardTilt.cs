@@ -1,24 +1,26 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using DG.Tweening;
 
-public class UICardTilt : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class UICardTilt : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
     [Header("Настройки эффекта")]
-    [Tooltip("Максимальный угол наклона карточки")]
     public float maxTiltAngle = 15f;
-
-    [Tooltip("Насколько карточка выдвигается вперед по оси Z при наведении (в пикселях/единицах UI)")]
     public float zOffset = 50f;
-
-    [Tooltip("Множитель увеличения размера при наведении (1.1 = +10%)")]
     public float scaleMultiplier = 1.1f;
-
-    [Tooltip("Длительность анимации приближения/удаления (в секундах)")]
     public float tweenDuration = 0.3f;
-
-    [Tooltip("Скорость возврата и следования за мышкой")]
     public float smoothSpeed = 10f;
+
+    [Header("Звук наведения")]
+    public AudioSource hoverSource;
+    public AudioClip[] hoverClips;
+    [Range(0f, 0.3f)] public float hoverPitchRange = 0.06f;
+
+    [Header("Звук нажатия")]
+    public AudioSource clickSource;
+    public AudioClip[] clickClips;
+    [Range(0f, 0.3f)] public float clickPitchRange = 0.06f;
 
     private RectTransform rectTransform;
     private Canvas parentCanvas;
@@ -29,46 +31,52 @@ public class UICardTilt : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private Vector3 initialScale;
     private bool isHovered = false;
 
+    private int lastHoverIndex = -1;
+    private int lastClickIndex = -1;
+
     void Start()
     {
         rectTransform = GetComponent<RectTransform>();
         parentCanvas = GetComponentInParent<Canvas>();
 
-        // Определяем камеру в зависимости от режима рендеринга Canvas
         if (parentCanvas != null)
-        {
             uiCamera = parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : parentCanvas.worldCamera;
-        }
 
         initialPosition = rectTransform.anchoredPosition3D;
         initialRotation = rectTransform.localRotation;
         initialScale = rectTransform.localScale;
+
+        if (hoverSource == null) hoverSource = GetComponent<AudioSource>();
     }
 
-    // Срабатывает, когда мышь заходит на UI-объект
     public void OnPointerEnter(PointerEventData eventData)
     {
         isHovered = true;
 
-        // Прерываем старые твины, чтобы не было конфликтов при быстром наведении
         rectTransform.DOKill();
 
-        // Выдвигаем вперёд по Z и увеличиваем относительно твоего исходного масштаба
         rectTransform.DOAnchorPos3D(new Vector3(initialPosition.x, initialPosition.y, initialPosition.z - zOffset), tweenDuration).SetEase(Ease.OutBack);
         rectTransform.DOScale(initialScale * scaleMultiplier, tweenDuration).SetEase(Ease.OutBack);
+
+        PlayRandomClip(hoverSource, hoverClips, hoverPitchRange, ref lastHoverIndex);
     }
 
-    // Срабатывает, когда мышь уходит с UI-объекта
     public void OnPointerExit(PointerEventData eventData)
     {
         isHovered = false;
 
         rectTransform.DOKill();
 
-        // Возвращаем всё в исходное состояние
         rectTransform.DOAnchorPos3D(initialPosition, tweenDuration).SetEase(Ease.OutCubic);
         rectTransform.DOScale(initialScale, tweenDuration).SetEase(Ease.OutCubic);
         rectTransform.DOLocalRotateQuaternion(initialRotation, tweenDuration).SetEase(Ease.OutCubic);
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+
+        PlayRandomClip(clickSource, clickClips, clickPitchRange, ref lastClickIndex);
     }
 
     void Update()
@@ -76,21 +84,44 @@ public class UICardTilt : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         if (isHovered)
         {
             Vector2 localPoint;
-            // Вычисляем положение мыши относительно центра нашей карточки
             RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, Input.mousePosition, uiCamera, out localPoint);
 
-            // Нормализуем координаты в диапазоне примерно от -1 до 1
             float normalizedX = localPoint.x / (rectTransform.rect.width * 0.5f);
             float normalizedY = localPoint.y / (rectTransform.rect.height * 0.5f);
 
-            // Считаем углы наклона за мышкой
             float targetRotationX = -normalizedY * maxTiltAngle;
             float targetRotationY = normalizedX * maxTiltAngle;
 
             Quaternion targetRotation = initialRotation * Quaternion.Euler(targetRotationX, targetRotationY, 0);
 
-            // Плавно поворачиваем карточку
             rectTransform.localRotation = Quaternion.Slerp(rectTransform.localRotation, targetRotation, Time.deltaTime * smoothSpeed);
         }
+    }
+
+    void PlayRandomClip(AudioSource source, AudioClip[] clips, float pitchRange, ref int lastIndex)
+    {
+        if (source == null || clips == null || clips.Length == 0) return;
+
+        int index;
+        if (clips.Length == 1)
+        {
+            index = 0;
+        }
+        else
+        {
+            do { index = Random.Range(0, clips.Length); }
+            while (index == lastIndex);
+            lastIndex = index;
+        }
+
+        source.pitch = 1f + Random.Range(-pitchRange, pitchRange);
+        source.PlayOneShot(clips[index]);
+        StartCoroutine(ResetPitchAfterClip(source, clips[index].length));
+    }
+
+    System.Collections.IEnumerator ResetPitchAfterClip(AudioSource source, float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        if (source != null) source.pitch = 1f;
     }
 }

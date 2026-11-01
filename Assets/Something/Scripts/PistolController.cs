@@ -23,9 +23,25 @@ public class PistolController : MonoBehaviour
 
     public PlayerController playerController;
 
+    // [+] --- Звук выстрела ---
+    [Header("Звук выстрела")]
+    public AudioSource shootSource;         // AudioSource для выстрелов
+    public AudioClip[] shootClips;          // Массив звуков выстрела (2-5 штук)
+    [Range(0f, 0.3f)] public float pitchRange = 0.08f; // Разброс питча
+    private int lastShootIndex = -1;        // Индекс прошлого звука
+
+    // [+] --- Звук перезарядки/пустой обоймы (опционально) ---
+    [Header("Звук пустой обоймы (опционально)")]
+    public AudioClip emptyClip;             // Например, "щёлк" без патронов
+    // [-
+
     void Start()
     {
         mainCamera = Camera.main;
+
+        // [+] Автопоиск AudioSource, если не назначен вручную
+        if (shootSource == null)
+            shootSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -42,18 +58,14 @@ public class PistolController : MonoBehaviour
 
         Vector2 direction = mousePosition - transform.position;
 
-        // Определяем сторону курсора
         bool mouseOnRight = direction.x >= 0;
 
         leftGun.gameObject.SetActive(!mouseOnRight);
         rightGun.gameObject.SetActive(mouseOnRight);
 
-        // Выбираем активный пистолет
         Transform activePivot = mouseOnRight ? PistolRight : PistolLeft;
 
-        // Поворачиваем его к курсору
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
         activePivot.rotation = Quaternion.Euler(0, 0, angle);
 
         if (Input.GetMouseButtonDown(0))
@@ -70,17 +82,58 @@ public class PistolController : MonoBehaviour
 
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
-            Vector2 shootDirection = (mainCamera.ScreenToWorldPoint(Input.mousePosition) - firePoint.position).normalized; // direction ошибку выдаёт
-            
+            Vector2 shootDirection = (mainCamera.ScreenToWorldPoint(Input.mousePosition) - firePoint.position).normalized;
             bullet.GetComponent<Pistol_Bullet>().Shoot(shootDirection);
 
+            // [+] Проигрываем звук выстрела
+            PlayShootSound();
+
             gameTimer.LessTime(1);
-            
         }
     }
+
     IEnumerator DisableLight(GameObject lightPoint)
     {
         yield return new WaitForSeconds(lightDuration);
         lightPoint.gameObject.SetActive(false);
     }
+
+    // [+] --- Логика звука выстрела ---
+    void PlayShootSound()
+    {
+        if (shootSource == null || shootClips == null || shootClips.Length == 0)
+            return;
+
+        int index;
+
+        if (shootClips.Length == 1)
+        {
+            index = 0;
+        }
+        else
+        {
+            // Не повторяем предыдущий звук
+            do
+            {
+                index = Random.Range(0, shootClips.Length);
+            } while (index == lastShootIndex);
+
+            lastShootIndex = index;
+        }
+
+        // Небольшой разброс питча — звук не "приедается"
+        shootSource.pitch = 1f + Random.Range(-pitchRange, pitchRange);
+        shootSource.PlayOneShot(shootClips[index]);
+
+        // Сбрасываем питч после проигрывания, чтобы не влиял на другие звуки
+        // (если этот AudioSource используется и для чего-то ещё)
+        StartCoroutine(ResetPitchAfterClip(shootClips[index].length));
+    }
+
+    IEnumerator ResetPitchAfterClip(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        shootSource.pitch = 1f;
+    }
+    // [-
 }
