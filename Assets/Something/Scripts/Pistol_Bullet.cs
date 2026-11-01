@@ -21,17 +21,23 @@ public class Pistol_Bullet : MonoBehaviour
     [Tooltip("Дополнительный отступ каждого клона вдоль его направления полёта.")]
     public float cloneForwardOffset = 0.3f;
 
+    [Tooltip("Сколько отскоков у клонов. -1 = столько же, сколько у оригинала.")]
+    public int cloneBounces = -1;
+
     [Header("Рикошет")]
     public int maxBounces = 3;
     [Range(0f, 1f)] public float bounceSpeedMultiplier = 1f;
     public float minBounceSpeed = 1f;
 
+    [Tooltip("На сколько сдвинуть пулю от стены после отскока (юниты).")]
+    public float bounceSeparation = 0.1f;
+
     [Header("Игрок")]
-    [Tooltip("Наносить ли урон игроку.")]
     public bool damagePlayer = true;
 
     private bool isClone;
     private int bouncesLeft;
+    private bool leftShooterCollider;
 
     Rigidbody2D rb;
     Vector2 direction;
@@ -65,22 +71,18 @@ public class Pistol_Bullet : MonoBehaviour
         rb.linearVelocity = direction * currentSpeed;
     }
 
-    private bool leftShooterCollider;
-
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.GetComponentInParent<PlayerStats>() != null)
             leftShooterCollider = true;
     }
 
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 1) Игрок — приоритет.
+        // 1) Игрок.
         PlayerStats playerStats = collision.GetComponentInParent<PlayerStats>();
         if (playerStats != null)
         {
-            // Пока пуля ещё внутри игрока — игнорируем.
             if (!leftShooterCollider)
                 return;
 
@@ -91,7 +93,7 @@ public class Pistol_Bullet : MonoBehaviour
             return;
         }
 
-        // 2) Враг — по компоненту, а не по тегу.
+        // 2) Враг.
         EnemyChase2D enemy = collision.GetComponentInParent<EnemyChase2D>();
         if (enemy != null)
         {
@@ -133,7 +135,17 @@ public class Pistol_Bullet : MonoBehaviour
         direction = Vector2.Reflect(direction, normal).normalized;
         currentSpeed *= bounceSpeedMultiplier;
 
-        rb.position += normal * 0.02f;
+        // Выводим пулю из коллайдера, чтобы OnTriggerEnter2D сработал снова.
+        Vector2 newPos = rb.position + normal * bounceSeparation;
+
+        // Дополнительно проверяем, что новая позиция не внутри стены.
+        // Если внутри — сдвигаем сильнее.
+        if (wall.OverlapPoint(newPos))
+        {
+            newPos = rb.position + normal * (bounceSeparation * 4f);
+        }
+
+        rb.position = newPos;
         rb.linearVelocity = direction * currentSpeed;
     }
 
@@ -155,24 +167,16 @@ public class Pistol_Bullet : MonoBehaviour
             return;
 
         Vector2 enemyCenter = enemyCollider.bounds.center;
-
-        // Радиус спавна = отступ от центра врага.
-        // Если хочешь гарантированно снаружи коллайдера — бери max(cloneSpawnOffset, bounds.extents.magnitude + 0.1f).
         float spawnRadius = cloneSpawnOffset;
 
         for (int i = 0; i < cloneCount; i++)
         {
-            // Равномерно распределяем углы по кругу.
             float angle = 360f * i / cloneCount;
-
-            // Направление от центра врага наружу — под этим углом.
             Vector2 outward = Rotate(Vector2.right, angle).normalized;
 
-            // Позиция на окружности вокруг врага.
             Vector3 spawnPos = enemyCenter + outward * spawnRadius
                              + outward * cloneForwardOffset;
 
-            // Клон летит наружу (во все стороны).
             Vector2 cloneDir = outward;
 
             GameObject clone = Instantiate(gameObject, spawnPos, Quaternion.identity);
@@ -185,7 +189,9 @@ public class Pistol_Bullet : MonoBehaviour
                 cloneBullet.currentSpeed = cloneBullet.speed;
                 cloneBullet.Shoot(cloneDir);
 
-                cloneBullet.SetBounces(0);
+                // Клоны рикошетят столько же, сколько оригинал (или cloneBounces).
+                int bounces = cloneBounces >= 0 ? cloneBounces : maxBounces;
+                cloneBullet.SetBounces(bounces);
 
                 if (cloneLifetime > 0f)
                     Destroy(clone, cloneLifetime);

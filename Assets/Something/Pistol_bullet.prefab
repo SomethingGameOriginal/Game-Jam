@@ -271,7 +271,7 @@ MonoBehaviour:
   cloneSpreadAngle: 60
   cloneSpeedMultiplier: 1
   cloneLifetime: 3
-  cloneSpawnOffset: 1.2
+  cloneSpawnOffset: 1.5
   cloneForwardOffset: 0.3
   maxBounces: 10
   bounceSpeedMultiplier: 1

@@ -5,11 +5,16 @@ using UnityEngine.UI;
 
 public class ModifierNotification : MonoBehaviour
 {
+    [Header("Визуал (дочерний объект, который включается/выключается)")]
+    [SerializeField] private GameObject visualRoot;
     [SerializeField] private CanvasGroup canvasGroup;
+
+    [Header("Контент")]
     [SerializeField] private Image icon;
     [SerializeField] private TMP_Text titleText;
     [SerializeField] private TMP_Text descriptionText;
 
+    [Header("Тайминги")]
     [SerializeField] private float fadeDuration = 0.35f;
     [SerializeField] private float visibleDuration = 2.5f;
 
@@ -17,20 +22,32 @@ public class ModifierNotification : MonoBehaviour
 
     private void Awake()
     {
-        canvasGroup.alpha = 0f;
-        gameObject.SetActive(false);
+        // Скрываем только визуал, сам скрипт остаётся активным.
+        if (visualRoot != null)
+            visualRoot.SetActive(false);
+
+        if (canvasGroup != null)
+            canvasGroup.alpha = 0f;
     }
 
     public void Show(PlayerModifier modifier)
     {
         if (modifier == null) return;
 
-        gameObject.SetActive(true);
+        if (visualRoot != null)
+            visualRoot.SetActive(true);
 
-        icon.sprite = modifier.icon;
-        icon.enabled = modifier.icon != null;
-        titleText.text = modifier.modifierName;
-        descriptionText.text = modifier.description;
+        if (icon != null)
+        {
+            icon.sprite = modifier.icon;
+            icon.enabled = modifier.icon != null;
+        }
+
+        if (titleText != null)
+            titleText.text = modifier.modifierName;
+
+        if (descriptionText != null)
+            descriptionText.text = modifier.description;
 
         if (currentRoutine != null)
             StopCoroutine(currentRoutine);
@@ -44,12 +61,16 @@ public class ModifierNotification : MonoBehaviour
         yield return new WaitForSeconds(visibleDuration);
         yield return Fade(1f, 0f, fadeDuration);
 
-        gameObject.SetActive(false);
+        if (visualRoot != null)
+            visualRoot.SetActive(false);
+
         currentRoutine = null;
     }
 
     private IEnumerator Fade(float from, float to, float duration)
     {
+        if (canvasGroup == null) yield break;
+
         if (duration <= 0f)
         {
             canvasGroup.alpha = to;

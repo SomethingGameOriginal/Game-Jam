@@ -74,7 +74,7 @@ public class PistolController : MonoBehaviour
             
             bullet.GetComponent<Pistol_Bullet>().Shoot(shootDirection);
 
-            gameTimer.LessTime(3);
+            gameTimer.LessTime(1);
             
         }
     }

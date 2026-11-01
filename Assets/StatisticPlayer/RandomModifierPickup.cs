@@ -10,16 +10,13 @@ public class RandomModifierPickup : MonoBehaviour
     [SerializeField] private ModifierNotification notification;
 
     private bool used;
-    public void Start()
-    {
-        notification = FindFirstObjectByType<ModifierNotification>();
-    }
 
 
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (!used)
         {
+            notification = collision.gameObject.GetComponent<ModifierNotification>();
             if (Input.GetKeyDown(KeyCode.F))
             {
                 Activate(collision.gameObject.GetComponent<PlayerStats>());
