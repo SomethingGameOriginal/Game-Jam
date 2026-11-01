@@ -466,7 +466,11 @@ public class EnemyChase2D : MonoBehaviour
         maxHealth -= damage;
 
         if (maxHealth <= 0)
+        {
+            if (SkillTreeManager.Instance != null)
+                SkillTreeManager.Instance.AddKill();
             Destroy(gameObject);
+        }
     }
 
     public void OnCollisionEnter2D(Collision2D collision)

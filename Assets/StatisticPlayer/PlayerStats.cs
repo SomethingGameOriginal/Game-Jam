@@ -65,9 +65,15 @@ public class PlayerStats : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        var blocker = GetComponent<DamageBlocker>();
+        if (blocker != null && blocker.TryBlock())
+        {
+            Debug.Log("Damage blocked!");
+            return;
+        }
+
         health = Mathf.Max(0f, health - damage);
         UpdateUI();
-
         if (health <= 0f && playerDeath != null)
             playerDeath.Die();
     }

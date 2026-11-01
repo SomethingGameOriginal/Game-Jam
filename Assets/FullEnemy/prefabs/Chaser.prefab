@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4186012250291551141}
   - component: {fileID: 7106117782380619594}
   - component: {fileID: 2444795317109325160}
+  - component: {fileID: 6996552192208703145}
   m_Layer: 9
   m_Name: Chaser
   m_TagString: Enemy
@@ -86,8 +87,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0.24166965, b: 0, a: 1}
+  m_Sprite: {fileID: -3403762635873316091, guid: 25b2b082d28d22f4fb8d989d1cd6d388, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -161,7 +162,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.8857143, y: 0.6857143}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -210,6 +211,9 @@ MonoBehaviour:
   rushDuration: 0.7
   rushCooldown: 5
   rushSpeedMultiplier: 2
+  animator: {fileID: 6996552192208703145}
+  moveBoolName: Walk
+  attackTriggerName: Attack
 --- !u!58 &2444795317109325160
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -246,6 +250,28 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0.008145094, y: -0.013751626}
   m_Radius: 1.4078915
+--- !u!95 &6996552192208703145
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5178552190261591864}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5ed4e1555a160af47a6b16da84c08083, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6510412597072102837
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,16 +18,47 @@ public class RangedEnemy : EnemyChase2D
     [Tooltip("Слои стен/препятствий. Должно быть НЕ пусто, иначе HasClearShot всегда false.")]
     [SerializeField] private LayerMask shootObstacleLayers;
 
+    [Header("Анимация")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private string moveBoolName = "isMoving";
+    [SerializeField] private string attackTriggerName = "Attack";
+
+    [Header("Поворот спрайта")]
+    [Tooltip("Компонент SpriteRenderer, который нужно переворачивать.")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [Tooltip("Поставь галочку, если спрайт по умолчанию смотрит ВЛЕВО.")]
+    [SerializeField] private bool spriteFacesLeftByDefault = false;
+
     private float fireTimer;
+
+    // Хэши для оптимизации Animator
+    private int moveBoolHash;
+    private int attackTriggerHash;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        // Инициализация хэшей аниматора
+        moveBoolHash = Animator.StringToHash(moveBoolName);
+        attackTriggerHash = Animator.StringToHash(attackTriggerName);
+
+        // Автопоиск компонентов, если не назначены
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+    }
 
     protected override void FixedUpdate()
     {
         bool seeing = FindPlayer();
 
-
         if (!seeing)
         {
             StopMoving();
+            UpdateAnimations(false); // Стоим
             return;
         }
 
@@ -40,6 +71,7 @@ public class RangedEnemy : EnemyChase2D
         if (player == null)
         {
             StopMoving();
+            UpdateAnimations(false);
             return;
         }
 
@@ -48,32 +80,39 @@ public class RangedEnemy : EnemyChase2D
         float distance = toPlayer.magnitude;
 
         bool hasShot = HasClearShot(out Vector2 shotDir);
+        bool isMoving = false;
+
+        // --- Поворот в сторону игрока ---
+        FacePlayer(playerPos.x);
 
         // --- Движение ---
         if (distance > desiredDistance + distanceTolerance)
         {
-            // Слишком далеко — сближаемся.
             MoveInDirection(GetMoveDirection(playerPos));
+            isMoving = true;
         }
         else if (hasShot && distance < desiredDistance - distanceTolerance)
         {
-            // Слишком близко, но стрелять можем — отступаем.
             MoveInDirection(GetRetreatDirection(-toPlayer));
+            isMoving = true;
         }
         else if (!hasShot && distance > minApproachDistance)
         {
-            // Стены мешают — подходим, чтобы найти угол.
             MoveInDirection(GetMoveDirection(playerPos));
+            isMoving = true;
         }
         else
         {
             StopMoving();
         }
 
+        UpdateAnimations(isMoving);
+
         // --- Стрельба ---
         if (hasShot)
         {
-            fireTimer -= Time.fixedDeltaTime;
+            if (fireTimer > 0f)
+                fireTimer -= Time.fixedDeltaTime;
 
             if (fireTimer <= 0f)
             {
@@ -85,6 +124,26 @@ public class RangedEnemy : EnemyChase2D
         {
             fireTimer = 0f;
         }
+    }
+
+    // Поворот спрайта в сторону игрока (только по X)
+    private void FacePlayer(float playerX)
+    {
+        if (spriteRenderer == null) return;
+
+        bool playerIsRight = playerX > transform.position.x;
+
+        // Если спрайт по умолчанию смотрит вправо:
+        // playerIsRight = true  -> flipX = false
+        // playerIsRight = false -> flipX = true
+        // Если по умолчанию влево — инвертируем.
+        spriteRenderer.flipX = !spriteFacesLeftByDefault ? playerIsRight : !playerIsRight;
+    }
+
+    private void UpdateAnimations(bool isMoving)
+    {
+        if (animator != null)
+            animator.SetBool(moveBoolHash, isMoving);
     }
 
     private bool HasClearShot(out Vector2 direction)
@@ -105,8 +164,6 @@ public class RangedEnemy : EnemyChase2D
 
         direction = offset.normalized;
 
-        // Если слой препятствий не задан — считаем, что стрелять можно
-        // (иначе враг вообще никогда не выстрелит при пустом поле).
         LayerMask mask = shootObstacleLayers.value != 0
             ? shootObstacleLayers
             : obstacleLayer;
@@ -128,15 +185,12 @@ public class RangedEnemy : EnemyChase2D
 
             Transform hitTransform = hit.collider.transform;
 
-            // Свои коллайдеры игнорируем.
             if (hitTransform == transform || hitTransform.IsChildOf(transform))
                 continue;
 
-            // Игрок — не препятствие.
             if (hitTransform == player || hitTransform.IsChildOf(player))
                 continue;
 
-            // Попали в стену.
             return false;
         }
 
@@ -150,6 +204,9 @@ public class RangedEnemy : EnemyChase2D
             Debug.LogWarning($"[RangedEnemy] Не назначен {(projectilePrefab == null ? "Projectile Prefab" : "Fire Point")} на {name}", this);
             return;
         }
+
+        if (animator != null)
+            animator.SetTrigger(attackTriggerHash);
 
         GameObject projectile = Instantiate(
             projectilePrefab,
