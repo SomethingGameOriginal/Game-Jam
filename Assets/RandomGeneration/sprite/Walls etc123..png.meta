@@ -1,0 +1,666 @@
+fileFormatVersion: 2
+guid: 2df3f0f2b30cc8e4fa8dc04d777e6468
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8561097552335315078
+    second: Walls etc123._0
+  - first:
+      213: 2445580025687632445
+    second: Walls etc123._1
+  - first:
+      213: 6351249954993610698
+    second: Walls etc123._2
+  - first:
+      213: -6873568788701750554
+    second: Walls etc123._3
+  - first:
+      213: -2499885062649597829
+    second: Walls etc123._4
+  - first:
+      213: 4501903928572789671
+    second: Walls etc123._5
+  - first:
+      213: -2695659262651892987
+    second: Walls etc123._6
+  - first:
+      213: 3164802347447421412
+    second: Walls etc123._7
+  - first:
+      213: -7356654392000323795
+    second: Walls etc123._8
+  - first:
+      213: 999153882400915078
+    second: Walls etc123._9
+  - first:
+      213: -5878977578960024151
+    second: Walls etc123._10
+  - first:
+      213: -2748260873352799871
+    second: Walls etc123._11
+  - first:
+      213: 9154672110969594875
+    second: Walls etc123._12
+  - first:
+      213: 6792233864485619633
+    second: Walls etc123._13
+  - first:
+      213: -2819681980858798954
+    second: Walls etc123._14
+  - first:
+      213: -505292393780926141
+    second: Walls etc123._15
+  - first:
+      213: -5693827908283275582
+    second: Walls etc123._16
+  - first:
+      213: -2924261525364098952
+    second: Walls etc123._17
+  - first:
+      213: -6587227361804177613
+    second: Walls etc123._18
+  - first:
+      213: -4228952878494904003
+    second: Walls etc123._19
+  - first:
+      213: 5027223216545156308
+    second: Walls etc123._20
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Walls etc123._0
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 163
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 680a96e7dd02fc670800000000000000
+      internalID: 8561097552335315078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._1
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 130
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3ae6ec731270f120800000000000000
+      internalID: 2445580025687632445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._2
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 163
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acf1c170f2c242850800000000000000
+      internalID: 6351249954993610698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._3
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 152
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ea583aba9d2c90a0800000000000000
+      internalID: -6873568788701750554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._4
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 132
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b70377dc7cf9e4dd0800000000000000
+      internalID: -2499885062649597829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._5
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 164
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a3448b55c9f97e30800000000000000
+      internalID: 4501903928572789671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._6
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 132
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50b742ece28179ad0800000000000000
+      internalID: -2695659262651892987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._7
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 132
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e90de797f2abeb20800000000000000
+      internalID: 3164802347447421412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._8
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 164
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2fd085cec9e7e990800000000000000
+      internalID: -7356654392000323795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._9
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 132
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68e757c8925bddd00800000000000000
+      internalID: 999153882400915078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._10
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 132
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ad0a934a0da96ea0800000000000000
+      internalID: -5878977578960024151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._11
+      rect:
+        serializedVersion: 2
+        x: 408
+        y: 164
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18993bdeb473cd9d0800000000000000
+      internalID: -2748260873352799871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._12
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 132
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf3a48908cdeb0f70800000000000000
+      internalID: 9154672110969594875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._13
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 97
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b74b0486bcd24e50800000000000000
+      internalID: 6792233864485619633
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._14
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 97
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69c675f7d2a7ed8d0800000000000000
+      internalID: -2819681980858798954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._15
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 100
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3492bf8be37dcf8f0800000000000000
+      internalID: -505292393780926141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._16
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 100
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c6e1924fa57bf0b0800000000000000
+      internalID: -5693827908283275582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._17
+      rect:
+        serializedVersion: 2
+        x: 408
+        y: 100
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 878b456d2afea67d0800000000000000
+      internalID: -2924261525364098952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._21
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 98
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 717a7604d7ce28c4bab3c46e4e0df8dd
+      internalID: -558277739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._22
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 130
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a0e73ff15be70344bb031c307ae071d1
+      internalID: -262490473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls etc123._23
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 162
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8fc76c4b8be58af4da1b57c9a113cb35
+      internalID: -1883961549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: e8e05f2867286414db49fdbac623752c
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Walls etc123._0: 8561097552335315078
+      Walls etc123._1: 2445580025687632445
+      Walls etc123._10: -5878977578960024151
+      Walls etc123._11: -2748260873352799871
+      Walls etc123._12: 9154672110969594875
+      Walls etc123._13: 6792233864485619633
+      Walls etc123._14: -2819681980858798954
+      Walls etc123._15: -505292393780926141
+      Walls etc123._16: -5693827908283275582
+      Walls etc123._17: -2924261525364098952
+      Walls etc123._18: -6587227361804177613
+      Walls etc123._19: -4228952878494904003
+      Walls etc123._2: 6351249954993610698
+      Walls etc123._20: 5027223216545156308
+      Walls etc123._21: -558277739
+      Walls etc123._22: -262490473
+      Walls etc123._23: -1883961549
+      Walls etc123._3: -6873568788701750554
+      Walls etc123._4: -2499885062649597829
+      Walls etc123._5: 4501903928572789671
+      Walls etc123._6: -2695659262651892987
+      Walls etc123._7: 3164802347447421412
+      Walls etc123._8: -7356654392000323795
+      Walls etc123._9: 999153882400915078
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

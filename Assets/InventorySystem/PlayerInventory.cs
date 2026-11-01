@@ -21,10 +21,19 @@ public class PlayerInventory : MonoBehaviour
     private int selectedSlot = -1;
     private GameObject equippedWeapon;
 
+    [Header("Стартовые предметы")]
+    [SerializeField] private InventoryItem startingWeapon;
+
     private void Start()
     {
         if (detailsPanel != null)
             detailsPanel.SetActive(false);
+
+        // Выдаём стартовый пистолет.
+        if (startingWeapon != null)
+        {
+            TryAddItem(startingWeapon);
+        }
     }
 
     private void Update()
@@ -127,13 +136,10 @@ public class PlayerInventory : MonoBehaviour
 
     private void DropSelectedItem()
     {
-        if (!IsValidSelectedSlot())
-            return;
+        if (!IsValidSelectedSlot()) return;
 
         InventoryItem item = items[selectedSlot];
-
-        if (item == null)
-            return;
+        if (item == null) return;
 
         if (item.pickupPrefab == null)
         {
@@ -141,10 +147,17 @@ public class PlayerInventory : MonoBehaviour
             return;
         }
 
-        Vector2 position = (Vector2)transform.position +
-                           GetDropDirection() * dropDistance;
+        Vector2 position = (Vector2)transform.position + GetDropDirection() * dropDistance;
 
-        Instantiate(item.pickupPrefab, position, Quaternion.identity);
+        GameObject pickupObj = Instantiate(item.pickupPrefab, position, Quaternion.identity);
+
+        // Передаём именно тот предмет, который выбросили.
+        ItemPickup pickup = pickupObj.GetComponent<ItemPickup>();
+        if (pickup != null)
+            pickup.Setup(item);
+        else
+            Debug.LogWarning($"На {item.pickupPrefab.name} нет ItemPickup — при подборе вернётся дефолтный предмет.");
+
         RemoveItem(selectedSlot);
     }
 

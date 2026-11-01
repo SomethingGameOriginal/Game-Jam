@@ -254,7 +254,7 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 256
-  sightRadius: 30
+  sightRadius: 20
   searchDuration: 3
   searchArrivalDistance: 0.2
   obstacleLayer:
@@ -280,4 +280,4 @@ MonoBehaviour:
   projectileDamage: 10
   shootObstacleLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128

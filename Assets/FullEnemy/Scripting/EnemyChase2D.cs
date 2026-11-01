@@ -32,6 +32,8 @@ public class EnemyChase2D : MonoBehaviour
     [Header("Отладка")]
     [SerializeField] private bool showGizmos = true;
 
+    private RoomController room;
+
     protected Rigidbody2D rb;
     protected Vector2 lastDirection;
     protected Vector2 LastKnownPlayerPosition { get; private set; }
@@ -72,6 +74,8 @@ public class EnemyChase2D : MonoBehaviour
 
         if (player != null)
             LastKnownPlayerPosition = player.position;
+
+        room = GetComponentInParent<RoomController>();
     }
 
     protected virtual void FixedUpdate()

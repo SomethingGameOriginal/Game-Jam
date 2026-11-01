@@ -10,6 +10,11 @@ public class ExitControllRoom : MonoBehaviour
         UpdateExit();
     }
 
+    public void FixedUpdate()
+    {
+        UpdateExit();
+    }
+
     private void UpdateExit()
     {
         if (exit == null)
@@ -31,6 +36,6 @@ public class ExitControllRoom : MonoBehaviour
 
         int count = roomCollider.Overlap(filter, objectsInside);
 
-        exit.SetActive(count > 1);
+        exit.SetActive(count > 2);
     }
 }

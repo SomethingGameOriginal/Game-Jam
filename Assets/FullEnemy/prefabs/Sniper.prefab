@@ -223,12 +223,12 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 256
-  sightRadius: 30
+  sightRadius: 20
   searchDuration: 3
   searchArrivalDistance: 0.2
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 128
   obstacleCheckDistance: 1.2
   obstacleRadius: 0.25
   wallFollowDuration: 1.2
@@ -236,7 +236,7 @@ MonoBehaviour:
   enemySpacing: 1.2
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 512
   separationWeight: 2
   showGizmos: 1
   preferredDistance: 9
@@ -245,7 +245,7 @@ MonoBehaviour:
   projectilePrefab: {fileID: 2455825155569105996, guid: d5763ba8e83ffa94f97baf6ec3b66a64, type: 3}
   firePoint: {fileID: 1737833689659081555}
   fireRate: 0.5
-  projectileSpeed: 12
+  projectileSpeed: 20
   projectileDamage: 15
 --- !u!1 &5493743540505735333
 GameObject:
