@@ -14,6 +14,9 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private Text infectionText;
     [SerializeField] private Image infectionBar;
 
+    [Header("Смерть")]
+    [SerializeField] private PlayerDeath playerDeath;
+
     private float currentMaxHealth;
     private float health;
     private float infection;
@@ -27,13 +30,24 @@ public class PlayerStats : MonoBehaviour
     {
         currentMaxHealth = maxHealth;
         health = currentMaxHealth;
-        infection = 51f;
+        infection = 0f;
+
+        if (playerDeath == null)
+            playerDeath = GetComponent<PlayerDeath>();
+
         UpdateUI();
     }
 
     private void Update()
     {
-        if (infection >= 100f || secondsPerIncrease <= 0f)
+        // Проверка заражения на 100
+        if (infection >= 100f)
+        {
+            if (playerDeath != null) playerDeath.Die();
+            return;
+        }
+
+        if (secondsPerIncrease <= 0f)
             return;
 
         infectionTimer += Time.deltaTime;
@@ -44,12 +58,18 @@ public class PlayerStats : MonoBehaviour
             infection = Mathf.Min(100f, infection + infectionIncrease);
             UpdateUI();
         }
+
+        if (infection >= 100f && playerDeath != null)
+            playerDeath.Die();
     }
 
     public void TakeDamage(float damage)
     {
         health = Mathf.Max(0f, health - damage);
         UpdateUI();
+
+        if (health <= 0f && playerDeath != null)
+            playerDeath.Die();
     }
 
     public void Heal(float amount)

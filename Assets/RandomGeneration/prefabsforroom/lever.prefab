@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3ce2cfcdd66e404fa6ad34b2c2265d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimeExtender
-  secondsToAdd: 15
+  secondsToAdd: 45
   oneUse: 1
   loss: {fileID: 0}
   anim: {fileID: 0}
