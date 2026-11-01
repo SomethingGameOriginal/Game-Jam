@@ -46,8 +46,6 @@ public class SniperEnemy : EnemyChase2D
         if (animator == null)
             animator = GetComponent<Animator>();
 
-        // ВАЖНО: не используем GetComponentInChildren для тела,
-        // потому что первым может найтись спрайт оружия.
         if (bodySpriteRenderer == null)
             bodySpriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -148,7 +146,7 @@ public class SniperEnemy : EnemyChase2D
         bodySpriteRenderer.flipX = !bodyFacesLeftByDefault ? playerIsRight : !playerIsRight;
     }
 
-    // Поворот ОРУЖИЯ к игроку
+    // Поворот ОРУЖИЯ к игроку (старая логика)
     private void AimWeapon(Vector2 playerPos)
     {
         if (weaponPivot == null) return;
@@ -158,30 +156,29 @@ public class SniperEnemy : EnemyChase2D
 
         if (direction.sqrMagnitude < 0.0001f) return;
 
-        // Считаем угол всегда от +X
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + weaponAngleOffset;
 
-        // Если игрок слева — зеркалим пивот по X и корректируем угол,
-        // чтобы ствол смотрел в правильную сторону.
-        bool facingLeft = direction.x < 0f;
+        bool facingLeft = playerPos.x < transform.position.x;
 
-        Vector3 scale = weaponPivot.localScale;
-        scale.x = facingLeft ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
-        weaponPivot.localScale = scale;
-
-        // При зеркалировании угол нужно инвертировать, иначе винтовка "отразится" не туда.
         if (facingLeft)
         {
-            angle = 180f - angle + weaponAngleOffset * 2f;
-            // или проще:
-            // angle = Mathf.Atan2(-direction.y, -direction.x) * Mathf.Rad2Deg + weaponAngleOffset;
+            angle += 180f;
+            if (weaponSpriteRenderer != null)
+            {
+                weaponSpriteRenderer.flipX = true;   // зеркалим по X
+                weaponSpriteRenderer.flipY = false;  // по Y не нужно
+            }
+        }
+        else
+        {
+            if (weaponSpriteRenderer != null)
+            {
+                weaponSpriteRenderer.flipX = false;  // ствол справа — не переворачиваем
+                weaponSpriteRenderer.flipY = false;
+            }
         }
 
         weaponPivot.rotation = Quaternion.Euler(0f, 0f, angle);
-
-        // Никакого flipY — он ломает вращение.
-        if (weaponSpriteRenderer != null)
-            weaponSpriteRenderer.flipY = false;
     }
 
     private void UpdateAnimations(bool isMoving)

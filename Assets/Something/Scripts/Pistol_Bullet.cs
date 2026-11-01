@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class Pistol_Bullet : MonoBehaviour
 {
     [Header("Полёт")]
@@ -15,21 +16,22 @@ public class Pistol_Bullet : MonoBehaviour
     public float cloneSpeedMultiplier = 1f;
     public float cloneLifetime = 3f;
 
-    [Tooltip("Отступ точки спавна клонов от центра врага (в юнитах).")]
+    [Tooltip("Отступ точки спавна клонов от центра врага.")]
     public float cloneSpawnOffset = 0.8f;
 
-    [Tooltip("Дополнительный отступ каждого клона вдоль его направления полёта.")]
+    [Tooltip("Дополнительный отступ клона вдоль направления полёта.")]
     public float cloneForwardOffset = 0.3f;
 
-    [Tooltip("Сколько отскоков у клонов. -1 = столько же, сколько у оригинала.")]
+    [Tooltip("-1 — использовать количество рикошетов оригинала.")]
     public int cloneBounces = -1;
 
     [Header("Рикошет")]
     public int maxBounces = 3;
-    [Range(0f, 1f)] public float bounceSpeedMultiplier = 1f;
-    public float minBounceSpeed = 1f;
 
-    [Tooltip("На сколько сдвинуть пулю от стены после отскока (юниты).")]
+    [Range(0f, 1f)]
+    public float bounceSpeedMultiplier = 1f;
+
+    public float minBounceSpeed = 1f;
     public float bounceSeparation = 0.1f;
 
     [Header("Игрок")]
@@ -38,25 +40,28 @@ public class Pistol_Bullet : MonoBehaviour
     private bool isClone;
     private int bouncesLeft;
     private bool leftShooterCollider;
+    private bool initialized;
 
-    private float extraDamage = 0f;
+    private float extraDamage;
+    private Rigidbody2D rb;
+    private Vector2 direction;
+    private float currentSpeed;
 
-    Rigidbody2D rb;
-    Vector2 direction;
-    float currentSpeed;
-
-    void Awake()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         currentSpeed = speed;
         bouncesLeft = maxBounces;
+    }
 
-        var player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            var bonus = player.GetComponent<BulletDamageBonus>();
-            if (bonus != null) extraDamage = bonus.bonusDamage;
-        }
+    /// <summary>
+    /// Вызывай после Instantiate пули из скрипта оружия.
+    /// </summary>
+    public void Initialize(Vector2 shootDirection, float bonusDamage)
+    {
+        extraDamage = bonusDamage;
+        Shoot(shootDirection);
+        initialized = true;
     }
 
     public void Shoot(Vector2 shootDirection)
@@ -75,9 +80,10 @@ public class Pistol_Bullet : MonoBehaviour
         bouncesLeft = count;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        rb.linearVelocity = direction * currentSpeed;
+        if (rb != null && direction.sqrMagnitude > 0f)
+            rb.linearVelocity = direction * currentSpeed;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -88,10 +94,11 @@ public class Pistol_Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 1) Игрок.
         PlayerStats playerStats = collision.GetComponentInParent<PlayerStats>();
+
         if (playerStats != null)
         {
+            // Не даём пуле сразу попасть в игрока, который её выпустил.
             if (!leftShooterCollider)
                 return;
 
@@ -102,11 +109,15 @@ public class Pistol_Bullet : MonoBehaviour
             return;
         }
 
-        // 2) Враг.
         EnemyChase2D enemy = collision.GetComponentInParent<EnemyChase2D>();
+
         if (enemy != null)
         {
-            int totalDamage = damage + Mathf.RoundToInt(extraDamage);
+            int totalDamage = Mathf.Max(
+                0,
+                damage + Mathf.RoundToInt(extraDamage)
+            );
+
             enemy.TakeDamage(totalDamage);
 
             if (!isClone)
@@ -116,12 +127,8 @@ public class Pistol_Bullet : MonoBehaviour
             return;
         }
 
-        // 3) Стена — рикошет.
         if (collision.CompareTag("Wall"))
-        {
             Bounce(collision);
-            return;
-        }
     }
 
     private void Bounce(Collider2D wall)
@@ -145,25 +152,20 @@ public class Pistol_Bullet : MonoBehaviour
         direction = Vector2.Reflect(direction, normal).normalized;
         currentSpeed *= bounceSpeedMultiplier;
 
-        // Выводим пулю из коллайдера, чтобы OnTriggerEnter2D сработал снова.
-        Vector2 newPos = rb.position + normal * bounceSeparation;
+        Vector2 newPosition = rb.position + normal * bounceSeparation;
 
-        // Дополнительно проверяем, что новая позиция не внутри стены.
-        // Если внутри — сдвигаем сильнее.
-        if (wall.OverlapPoint(newPos))
-        {
-            newPos = rb.position + normal * (bounceSeparation * 4f);
-        }
+        if (wall.OverlapPoint(newPosition))
+            newPosition = rb.position + normal * (bounceSeparation * 4f);
 
-        rb.position = newPos;
+        rb.position = newPosition;
         rb.linearVelocity = direction * currentSpeed;
     }
 
     private Vector2 GetContactNormal(Collider2D wall)
     {
-        Vector2 bulletPos = transform.position;
-        Vector2 closest = wall.ClosestPoint(bulletPos);
-        Vector2 normal = bulletPos - closest;
+        Vector2 bulletPosition = transform.position;
+        Vector2 closestPoint = wall.ClosestPoint(bulletPosition);
+        Vector2 normal = bulletPosition - closestPoint;
 
         if (normal.sqrMagnitude < 0.0001f)
             normal = -direction;
@@ -177,47 +179,52 @@ public class Pistol_Bullet : MonoBehaviour
             return;
 
         Vector2 enemyCenter = enemyCollider.bounds.center;
-        float spawnRadius = cloneSpawnOffset;
 
         for (int i = 0; i < cloneCount; i++)
         {
             float angle = 360f * i / cloneCount;
-            Vector2 outward = Rotate(Vector2.right, angle).normalized;
+            Vector2 cloneDirection = Rotate(Vector2.right, angle);
 
-            Vector3 spawnPos = enemyCenter + outward * spawnRadius
-                             + outward * cloneForwardOffset;
+            Vector3 spawnPosition =
+                enemyCenter +
+                cloneDirection * (cloneSpawnOffset + cloneForwardOffset);
 
-            Vector2 cloneDir = outward;
+            GameObject cloneObject = Instantiate(
+                gameObject,
+                spawnPosition,
+                Quaternion.identity
+            );
 
-            GameObject clone = Instantiate(gameObject, spawnPos, Quaternion.identity);
+            Pistol_Bullet cloneBullet =
+                cloneObject.GetComponent<Pistol_Bullet>();
 
-            Pistol_Bullet cloneBullet = clone.GetComponent<Pistol_Bullet>();
-            if (cloneBullet != null)
-            {
-                cloneBullet.MarkAsClone();
-                cloneBullet.speed = speed * cloneSpeedMultiplier;
-                cloneBullet.currentSpeed = cloneBullet.speed;
-                cloneBullet.Shoot(cloneDir);
+            if (cloneBullet == null)
+                continue;
 
-                // Клоны рикошетят столько же, сколько оригинал (или cloneBounces).
-                int bounces = cloneBounces >= 0 ? cloneBounces : maxBounces;
-                cloneBullet.SetBounces(bounces);
+            cloneBullet.MarkAsClone();
+            cloneBullet.speed = speed * cloneSpeedMultiplier;
+            cloneBullet.currentSpeed = cloneBullet.speed;
 
-                if (cloneLifetime > 0f)
-                    Destroy(clone, cloneLifetime);
-            }
+            // Передаём тот же бонус урона клону.
+            cloneBullet.Initialize(cloneDirection, extraDamage);
+
+            int bounces = cloneBounces >= 0 ? cloneBounces : maxBounces;
+            cloneBullet.SetBounces(bounces);
+
+            if (cloneLifetime > 0f)
+                Destroy(cloneObject, cloneLifetime);
         }
     }
 
-    private static Vector2 Rotate(Vector2 v, float degrees)
+    private static Vector2 Rotate(Vector2 vector, float degrees)
     {
-        float rad = degrees * Mathf.Deg2Rad;
-        float sin = Mathf.Sin(rad);
-        float cos = Mathf.Cos(rad);
+        float radians = degrees * Mathf.Deg2Rad;
+        float sin = Mathf.Sin(radians);
+        float cos = Mathf.Cos(radians);
 
         return new Vector2(
-            v.x * cos - v.y * sin,
-            v.x * sin + v.y * cos
+            vector.x * cos - vector.y * sin,
+            vector.x * sin + vector.y * cos
         ).normalized;
     }
 }
