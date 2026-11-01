@@ -1,25 +1,28 @@
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
+using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class SkillSaveData
 {
-    public int coins;
-    public List<string> unlockedSkillIds = new List<string>();
     public int totalKills;
+    public List<string> unlockedIds = new();
 }
 
 public class SkillTreeManager : MonoBehaviour
 {
     public static SkillTreeManager Instance { get; private set; }
 
-    [Header("Skill Definitions (assign in Inspector)")]
-    public List<SkillNodeData> allSkills = new List<SkillNodeData>();
+    [SerializeField] private List<SkillDefinition> skills = new();
 
-    public SkillSaveData SaveData { get; private set; } = new SkillSaveData();
+    public event Action Changed;
+    public IReadOnlyList<SkillDefinition> Skills => skills;
+    public int TotalKills => saveData.totalKills;
 
-    private string SavePath => Path.Combine(Application.persistentDataPath, "skilltree_save.json");
+    private SkillSaveData saveData = new();
+    private string SavePath => Path.Combine(
+        Application.persistentDataPath, "skills.json");
 
     private void Awake()
     {
@@ -28,91 +31,123 @@ public class SkillTreeManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
         Load();
+
+        bool dirty = false;
+        foreach (var skill in skills)
+        {
+            if (skill != null && skill.StartingSkill &&
+                !saveData.unlockedIds.Contains(skill.Id))
+            {
+                saveData.unlockedIds.Add(skill.Id);
+                dirty = true;
+            }
+        }
+
+        if (dirty)
+            Save();
+
+        // Оповестим подписчиков на следующем кадре — к этому моменту
+        // все UI уже подписались в OnEnable.
+        StartCoroutine(NotifyNextFrame());
     }
 
-    public bool IsUnlocked(string skillId) => SaveData.unlockedSkillIds.Contains(skillId);
-
-    public bool CanUnlock(SkillNodeData skill)
+    private System.Collections.IEnumerator NotifyNextFrame()
     {
-        if (IsUnlocked(skill.skillId)) return false;
-        if (SaveData.coins < skill.cost) return false;
-        // е‰ЌзЅ®жЉЂиѓЅжЈЂжџҐ
-        foreach (var pre in skill.prerequisites)
-        {
-            if (!IsUnlocked(pre.skillId)) return false;
-        }
+        yield return null;
+        Changed?.Invoke();
+    }
+
+    public bool IsUnlocked(SkillDefinition skill) =>
+        skill != null && saveData.unlockedIds.Contains(skill.Id);
+
+    public bool CanUnlock(SkillDefinition skill)
+    {
+        if (skill == null || IsUnlocked(skill) || skill.StartingSkill)
+            return false;
+
+        bool parentUnlocked =
+            skill.Parent == null || IsUnlocked(skill.Parent);
+
+        return parentUnlocked && saveData.totalKills >= skill.KillCost;
+    }
+
+    public bool TryUnlock(SkillDefinition skill)
+    {
+        if (!CanUnlock(skill))
+            return false;
+
+        saveData.totalKills -= skill.KillCost;
+        saveData.unlockedIds.Add(skill.Id);
+
+        Save();
+        Changed?.Invoke();
         return true;
     }
 
-    public bool TryUnlock(SkillNodeData skill)
+    public void RegisterKill(int amount = 1)
     {
-        if (!CanUnlock(skill)) return false;
+        if (amount <= 0)
+            return;
 
-        SaveData.coins -= skill.cost;
-        SaveData.unlockedSkillIds.Add(skill.skillId);
-
-        ApplySkillEffect(skill);
+        saveData.totalKills += amount;
         Save();
-        return true;
-    }
-
-    public void AddKill(int amount = 1)
-    {
-        SaveData.totalKills += amount;
-        SaveData.coins += amount;
-        Save();
-    }
-
-    private void ApplySkillEffect(SkillNodeData skill)
-    {
-        var player = GameObject.FindGameObjectWithTag("Player");
-        if (player == null) return;
-
-        switch (skill.effectType)
-        {
-            case SkillEffectType.MoveSpeed:
-                var pc = player.GetComponent<PlayerController>();
-                if (pc != null) pc.speed += skill.value;
-                break;
-
-            case SkillEffectType.MaxHealth:
-                var ps = player.GetComponent<PlayerStats>();
-                if (ps != null) ps.ModifyMaxHealth(skill.value);
-                break;
-
-            case SkillEffectType.DamageBlock:
-                var block = player.GetComponent<DamageBlocker>();
-                if (block != null) block.blockChance += skill.value;
-                break;
-
-            case SkillEffectType.BulletDamage:
-                var bulletPrefabSetter = player.GetComponent<BulletDamageBonus>();
-                if (bulletPrefabSetter != null) bulletPrefabSetter.bonusDamage += skill.value;
-                break;
-        }
+        Changed?.Invoke();
     }
 
     public void Save()
     {
-        string json = JsonUtility.ToJson(SaveData, true);
-        File.WriteAllText(SavePath, json);
-        Debug.Log("SkillTree saved to " + SavePath);
+        File.WriteAllText(SavePath, JsonUtility.ToJson(saveData));
     }
 
-    public void Load()
+    private void Load()
     {
-        if (File.Exists(SavePath))
+        if (!File.Exists(SavePath))
         {
-            string json = File.ReadAllText(SavePath);
-            SaveData = JsonUtility.FromJson<SkillSaveData>(json);
+            saveData = new SkillSaveData();
+            return;
         }
-        else
+
+        try
         {
-            SaveData = new SkillSaveData();
-            SaveData.coins = 0;
+            saveData = JsonUtility.FromJson<SkillSaveData>(
+                File.ReadAllText(SavePath)) ?? new SkillSaveData();
+            saveData.unlockedIds ??= new List<string>();
         }
+        catch (Exception e)
+        {
+            Debug.LogError($"Не удалось загрузить навыки: {e.Message}");
+            saveData = new SkillSaveData();
+        }
+    }
+
+    public void ResetAll()
+    {
+        saveData.totalKills = 0;
+        saveData.unlockedIds.Clear();
+
+        foreach (var skill in skills)
+        {
+            if (skill != null && skill.StartingSkill)
+                saveData.unlockedIds.Add(skill.Id);
+        }
+
+        Save();
+        Changed?.Invoke();
+        Debug.Log("[SkillTree] Навыки сброшены");
+    }
+
+    public float GetBonus(SkillBonusType type)
+    {
+        float total = 0f;
+        foreach (var skill in skills)
+        {
+            if (skill != null && IsUnlocked(skill) && skill.BonusType == type)
+                total += skill.BonusValue;
+        }
+        return total;
     }
 }

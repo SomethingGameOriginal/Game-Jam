@@ -28,14 +28,39 @@ public class PlayerStats : MonoBehaviour
 
     private void Start()
     {
-        currentMaxHealth = maxHealth;
-        health = currentMaxHealth;
-        infection = 0f;
-
         if (playerDeath == null)
             playerDeath = GetComponent<PlayerDeath>();
 
+        RecalculateMaxHealth();
+        health = currentMaxHealth;
+
+        // подписка на изменения навыков
+        if (SkillTreeManager.Instance != null)
+            SkillTreeManager.Instance.Changed += OnSkillsChanged;
+
         UpdateUI();
+    }
+
+    private void OnDestroy()
+    {
+        if (SkillTreeManager.Instance != null)
+            SkillTreeManager.Instance.Changed -= OnSkillsChanged;
+    }
+
+    private void OnSkillsChanged()
+    {
+        RecalculateMaxHealth();
+        UpdateUI();
+    }
+
+    private void RecalculateMaxHealth()
+    {
+        float bonus = 0f;
+        if (SkillTreeManager.Instance != null)
+            bonus = SkillTreeManager.Instance.GetBonus(SkillBonusType.MaxHealth);
+
+        currentMaxHealth = Mathf.Max(1f, maxHealth + bonus);
+        health = Mathf.Min(health, currentMaxHealth);
     }
 
     private void Update()
@@ -65,12 +90,8 @@ public class PlayerStats : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        var blocker = GetComponent<DamageBlocker>();
-        if (blocker != null && blocker.TryBlock())
-        {
-            Debug.Log("Damage blocked!");
-            return;
-        }
+       // var blocker = GetComponent<DamageBlocker>();
+        
 
         health = Mathf.Max(0f, health - damage);
         UpdateUI();

@@ -467,8 +467,7 @@ public class EnemyChase2D : MonoBehaviour
 
         if (maxHealth <= 0)
         {
-            if (SkillTreeManager.Instance != null)
-                SkillTreeManager.Instance.AddKill();
+            SkillTreeManager.Instance?.RegisterKill();
             Destroy(gameObject);
         }
     }
