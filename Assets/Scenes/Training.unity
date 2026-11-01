@@ -8627,6 +8627,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6282226989604062755, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1997743378}
+    - targetCorrespondingSourceObject: {fileID: 6282226989604062755, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1997743379}
   m_SourcePrefab: {fileID: 100100000, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
 --- !u!1 &664401417
 GameObject:
@@ -11942,7 +11945,7 @@ PlayableDirector:
   m_Enabled: 1
   serializedVersion: 3
   m_PlayableAsset: {fileID: 11400000, guid: 7d44b52309ce1cd44a8fc0032c42e980, type: 2}
-  m_InitialState: 1
+  m_InitialState: 0
   m_WrapMode: 2
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
@@ -23189,6 +23192,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd54d2d385efe8a46a30ad4abb330e29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ManageSceneF
+--- !u!114 &1997743379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1997743350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b5066d4966d47e46bf72ce90d41eebd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Poshalka
+  gameTimer: {fileID: 326615292}
+  WASD: {fileID: 6776718267575070786, guid: 1b7600162da0e3340a0a19b24651d5bb, type: 3}
+  Use: 0
 --- !u!1 &2034545808
 GameObject:
   m_ObjectHideFlags: 0
