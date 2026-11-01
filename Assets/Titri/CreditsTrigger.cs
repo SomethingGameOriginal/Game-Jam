@@ -23,6 +23,8 @@ public class CreditsTrigger : MonoBehaviour
             rb.angularVelocity = 0f;
         }
 
+        player.GetComponent<StartTitries>().StartTeatres();
+
         // Показываем титры
         if (creditsPanel != null)
             creditsPanel.SetActive(true);

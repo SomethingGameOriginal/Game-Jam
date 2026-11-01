@@ -1789,11 +1789,11 @@ RectTransform:
   - {fileID: 174770519}
   - {fileID: 600373009}
   - {fileID: 1826685558}
+  - {fileID: 721246030}
   - {fileID: 12976612}
   - {fileID: 228406861}
   - {fileID: 1910070325}
   - {fileID: 399598770}
-  - {fileID: 721246030}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

@@ -16,21 +16,14 @@ public class Pistol_Bullet : MonoBehaviour
     public float cloneSpeedMultiplier = 1f;
     public float cloneLifetime = 3f;
 
-    [Tooltip("Отступ точки спавна клонов от центра врага.")]
     public float cloneSpawnOffset = 0.8f;
-
-    [Tooltip("Дополнительный отступ клона вдоль направления полёта.")]
     public float cloneForwardOffset = 0.3f;
-
-    [Tooltip("-1 — использовать количество рикошетов оригинала.")]
     public int cloneBounces = -1;
 
     [Header("Рикошет")]
     public int maxBounces = 3;
-
     [Range(0f, 1f)]
     public float bounceSpeedMultiplier = 1f;
-
     public float minBounceSpeed = 1f;
     public float bounceSeparation = 0.1f;
 
@@ -54,9 +47,6 @@ public class Pistol_Bullet : MonoBehaviour
         bouncesLeft = maxBounces;
     }
 
-    /// <summary>
-    /// Вызывай после Instantiate пули из скрипта оружия.
-    /// </summary>
     public void Initialize(Vector2 shootDirection, float bonusDamage)
     {
         extraDamage = bonusDamage;
@@ -69,10 +59,7 @@ public class Pistol_Bullet : MonoBehaviour
         direction = shootDirection.normalized;
     }
 
-    public void MarkAsClone()
-    {
-        isClone = true;
-    }
+    public void MarkAsClone() => isClone = true;
 
     public void SetBounces(int count)
     {
@@ -98,7 +85,6 @@ public class Pistol_Bullet : MonoBehaviour
 
         if (playerStats != null)
         {
-            // Не даём пуле сразу попасть в игрока, который её выпустил.
             if (!leftShooterCollider)
                 return;
 
@@ -113,11 +99,8 @@ public class Pistol_Bullet : MonoBehaviour
 
         if (enemy != null)
         {
-            int totalDamage = Mathf.Max(
-                0,
-                damage + Mathf.RoundToInt(extraDamage)
-            );
-
+            // float → int
+            int totalDamage = Mathf.RoundToInt(GetDamage());
             enemy.TakeDamage(totalDamage);
 
             if (!isClone)
@@ -131,6 +114,15 @@ public class Pistol_Bullet : MonoBehaviour
             Bounce(collision);
     }
 
+    private float GetDamage()
+    {
+        float bonus = SkillTreeManager.Instance != null
+            ? SkillTreeManager.Instance.GetBonus(SkillBonusType.Damage)
+            : 0f;
+
+        return damage + bonus;
+    }
+
     private void Bounce(Collider2D wall)
     {
         if (bouncesLeft <= 0 || currentSpeed < minBounceSpeed)
@@ -142,7 +134,6 @@ public class Pistol_Bullet : MonoBehaviour
         bouncesLeft--;
 
         Vector2 normal = GetContactNormal(wall);
-
         if (normal == Vector2.zero)
         {
             Destroy(gameObject);
@@ -153,7 +144,6 @@ public class Pistol_Bullet : MonoBehaviour
         currentSpeed *= bounceSpeedMultiplier;
 
         Vector2 newPosition = rb.position + normal * bounceSeparation;
-
         if (wall.OverlapPoint(newPosition))
             newPosition = rb.position + normal * (bounceSeparation * 4f);
 
@@ -205,7 +195,6 @@ public class Pistol_Bullet : MonoBehaviour
             cloneBullet.speed = speed * cloneSpeedMultiplier;
             cloneBullet.currentSpeed = cloneBullet.speed;
 
-            // Передаём тот же бонус урона клону.
             cloneBullet.Initialize(cloneDirection, extraDamage);
 
             int bounces = cloneBounces >= 0 ? cloneBounces : maxBounces;

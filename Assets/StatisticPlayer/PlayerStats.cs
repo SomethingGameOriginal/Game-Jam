@@ -17,28 +17,51 @@ public class PlayerStats : MonoBehaviour
     [Header("Смерть")]
     [SerializeField] private PlayerDeath playerDeath;
 
+    [Header("Дебаг")]
+    [SerializeField] private bool debug = false;
+
+    // runtime
     private float currentMaxHealth;
     private float health;
     private float infection;
     private float infectionTimer;
 
-    // Добавить в PlayerStats
+    // бонусы (кэш)
+    private float bonusMaxHealth;
+    private float bonusBlockChance;
+
     public float Infection => infection;
     public bool IsAlive => health > 0f;
+    public float Health => health;
+    public float MaxHealth => currentMaxHealth;
 
-    private void Start()
+    public bool Use;
+
+    // =========================================================
+    //  LIFECYCLE
+    // =========================================================
+    private void Awake()
     {
         if (playerDeath == null)
             playerDeath = GetComponent<PlayerDeath>();
+    }
 
-        RecalculateMaxHealth();
-        health = currentMaxHealth;
-
-        // подписка на изменения навыков
+    private void Start()
+    {
         if (SkillTreeManager.Instance != null)
             SkillTreeManager.Instance.Changed += OnSkillsChanged;
 
+        RefreshBonuses();
+        RecalculateMaxHealth();
+        health = currentMaxHealth;
+        infection = 0f;
+        infectionTimer = 0f;
+
         UpdateUI();
+
+        if (debug)
+            Debug.Log($"[PlayerStats] Start: maxHealth={currentMaxHealth}, " +
+                      $"blockChance={bonusBlockChance:P0}");
     }
 
     private void OnDestroy()
@@ -49,23 +72,33 @@ public class PlayerStats : MonoBehaviour
 
     private void OnSkillsChanged()
     {
+        RefreshBonuses();
         RecalculateMaxHealth();
         UpdateUI();
+
+        if (debug)
+            Debug.Log($"[PlayerStats] Skills changed: maxHealth={currentMaxHealth}, " +
+                      $"blockChance={bonusBlockChance:P0}");
+    }
+
+    private void RefreshBonuses()
+    {
+        var mgr = SkillTreeManager.Instance;
+        bonusMaxHealth = mgr != null ? mgr.GetBonus(SkillBonusType.MaxHealth) : 0f;
+        bonusBlockChance = mgr != null ? mgr.GetBonus(SkillBonusType.DamageBlockChance) : 0f;
     }
 
     private void RecalculateMaxHealth()
     {
-        float bonus = 0f;
-        if (SkillTreeManager.Instance != null)
-            bonus = SkillTreeManager.Instance.GetBonus(SkillBonusType.MaxHealth);
-
-        currentMaxHealth = Mathf.Max(1f, maxHealth + bonus);
+        currentMaxHealth = Mathf.Max(1f, maxHealth + bonusMaxHealth);
         health = Mathf.Min(health, currentMaxHealth);
     }
 
+    // =========================================================
+    //  UPDATE
+    // =========================================================
     private void Update()
     {
-        // Проверка заражения на 100
         if (infection >= 100f)
         {
             if (playerDeath != null) playerDeath.Die();
@@ -84,19 +117,43 @@ public class PlayerStats : MonoBehaviour
             UpdateUI();
         }
 
+        if (infection >= 50f)
+        {
+            CanvasTooltip.Show("Теперь вы можете применить способность из-за паразитов, нажав на C, вы ускорите заражение паразитами, но нанесете мощный удар");
+        }
+
         if (infection >= 100f && playerDeath != null)
-            playerDeath.Die();
+            playerDeath.Die(DeathCause.Infection, $"{Mathf.CeilToInt(infection)}%");
     }
 
+    // =========================================================
+    //  DAMAGE / HEAL
+    // =========================================================
     public void TakeDamage(float damage)
     {
-       // var blocker = GetComponent<DamageBlocker>();
-        
+        if (damage <= 0f)
+            return;
+
+        // блок урона
+        if (bonusBlockChance > 0f)
+        {
+            float chance = Mathf.Clamp01(bonusBlockChance);
+            if (Random.value < chance)
+            {
+                if (debug)
+                    Debug.Log($"[PlayerStats] Урон {damage} заблокирован ({chance:P0})");
+                return;
+            }
+        }
 
         health = Mathf.Max(0f, health - damage);
         UpdateUI();
+
+        if (debug)
+            Debug.Log($"[PlayerStats] TakeDamage {damage}, hp={health}/{currentMaxHealth}");
+
         if (health <= 0f && playerDeath != null)
-            playerDeath.Die();
+            playerDeath.Die(DeathCause.Damage, "пуля/удар");
     }
 
     public void Heal(float amount)
@@ -107,7 +164,7 @@ public class PlayerStats : MonoBehaviour
 
     public void HealPoisonous(float amount)
     {
-        infection = Mathf.Min(currentMaxHealth, infection - amount);
+        infection = Mathf.Max(0f, infection - amount);
         UpdateUI();
     }
 
@@ -119,10 +176,9 @@ public class PlayerStats : MonoBehaviour
 
     public void ModifyMaxHealth(float amount)
     {
-        currentMaxHealth = Mathf.Max(1f, currentMaxHealth + amount);
-
-        // Если максимум уменьшился ниже текущего здоровья, ограничиваем здоровье.
-        health = Mathf.Min(health, currentMaxHealth);
+        // меняем БАЗУ, а не текущий максимум — иначе бонус затрётся
+        maxHealth = Mathf.Max(1f, maxHealth + amount);
+        RecalculateMaxHealth();
         UpdateUI();
     }
 
@@ -136,6 +192,9 @@ public class PlayerStats : MonoBehaviour
         secondsPerIncrease = Mathf.Max(0.1f, secondsPerIncrease + amount);
     }
 
+    // =========================================================
+    //  UI
+    // =========================================================
     private void UpdateUI()
     {
         if (healthText != null)

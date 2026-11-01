@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 029ee3c08bf8e5b40903d094d8f39ff6, type: 3}
+  m_Name: Start 3
+  m_EditorClassIdentifier: Assembly-CSharp::SkillNodeData
+  id: Damage3
+  title: "\u041C\u0430\u0441\u0442\u0435\u0440 \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B"
+  description: "\u0425\u043E\u0440\u043E\u0448\u0435\u043C\u0443 \u0441\u0442\u0440\u0435\u043B\u043A\u0443
+    \u043D\u0443\u0436\u043D\u043E 1 \u043F\u0443\u043B\u044F \u043D\u0430 \u0432\u0440\u0430\u0433\u0430.
+    \u0423\u0440\u043E\u043D \u043F\u043E\u0432\u044B\u0448\u0435\u043D \u043D\u0430
+    15"
+  icon: {fileID: -2527061867981002096, guid: 5a5cce22901a9724eb12dcbfdb29532b, type: 3}
+  accentColor: {r: 1, g: 1, b: 1, a: 1}
+  frame: {fileID: -1258723228921493665, guid: 5a5cce22901a9724eb12dcbfdb29532b, type: 3}
+  parent: {fileID: 11400000, guid: 20aaae5ffbba9aa40a5bfadf8af1b464, type: 2}
+  treePosition: {x: -800, y: -80}
+  killCost: 100
+  startingSkill: 0
+  bonusType: 2
+  bonusValue: 15

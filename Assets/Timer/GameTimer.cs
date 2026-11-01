@@ -42,7 +42,7 @@ public class GameTimer : MonoBehaviour
             OnTimeUp?.Invoke();
 
             if (playerDeath != null)
-                playerDeath.Die();
+                playerDeath.Die(DeathCause.Timer);
         }
     }
 

@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Skill1
   m_EditorClassIdentifier: Assembly-CSharp::SkillDefinition
   id: 1
-  title: "\u041F\u0440\u043E\u0441\u0442\u043E"
-  description: "\u041E\u0434\u0438\u043D\u0430\u0434\u0446\u0430\u0442\u044C"
+  title: "\u0416\u0438\u0432\u0447\u0438\u043A"
+  description: "\u0412 \u0434\u0430\u043D\u043D\u043E\u043C \u043C\u0435\u0441\u0442\u0435
+    \u043D\u0435 \u043F\u043E\u043C\u0435\u0448\u0430\u0435\u0442 \u043D\u0435\u043C\u043D\u043E\u0433\u043E
+    \u0436\u0438\u0432\u0443\u0447\u0435\u0441\u0442\u0438"
   icon: {fileID: -5150252648875899645, guid: 5a5cce22901a9724eb12dcbfdb29532b, type: 3}
   accentColor: {r: 1, g: 1, b: 1, a: 1}
   frame: {fileID: -1258723228921493665, guid: 5a5cce22901a9724eb12dcbfdb29532b, type: 3}
