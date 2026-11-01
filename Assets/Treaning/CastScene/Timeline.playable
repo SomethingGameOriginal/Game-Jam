@@ -66,7 +66,10 @@ MonoBehaviour:
   m_Children: []
   m_Clips: []
   m_Markers:
-    m_Objects: []
+    m_Objects:
+    - {fileID: 7243877592034343962}
+    - {fileID: 6736280957185410658}
+    - {fileID: -5773404510090440451}
 --- !u!114 &-6501670010245948048
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -161,7 +164,7 @@ MonoBehaviour:
     m_Start: 2.9
     m_ClipIn: 0
     m_Asset: {fileID: -7309068873010813497}
-    m_Duration: 1.2333333333333338
+    m_Duration: 5.133333333333333
     m_TimeScale: 1
     m_ParentTrack: {fileID: -6501670010245948048}
     m_EaseInDuration: 0
@@ -356,6 +359,22 @@ MonoBehaviour:
   m_OpenClipOffsetRotation: {x: 0, y: 0, z: 0, w: 1}
   m_Rotation: {x: 0, y: 0, z: 0, w: 1}
   m_ApplyOffsets: 0
+--- !u!114 &-5773404510090440451
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
+  m_Name: Signal Emitter
+  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Time: 9.58333333333333
+  m_Retroactive: 0
+  m_EmitOnce: 0
+  m_Asset: {fileID: 11400000, guid: c146d1085114d16469e3722d2a101273, type: 2}
 --- !u!114 &-3368847116363626341
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -410,6 +429,22 @@ MonoBehaviour:
     m_ScenePreview: 1
   m_DurationMode: 0
   m_MarkerTrack: {fileID: 0}
+--- !u!114 &703802439787138994
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
+  m_Name: Signal Emitter
+  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Time: 7.25
+  m_Retroactive: 0
+  m_EmitOnce: 0
+  m_Asset: {fileID: 11400000, guid: c146d1085114d16469e3722d2a101273, type: 2}
 --- !u!114 &1974707675077461547
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -501,10 +536,10 @@ MonoBehaviour:
     m_PreExtrapolationTime: 0
     m_DisplayName: SentencePerformingClipAsset
   - m_Version: 1
-    m_Start: 3.933333333333333
+    m_Start: 4.25
     m_ClipIn: 0
     m_Asset: {fileID: 4144435188293103067}
-    m_Duration: 0.8999999999999999
+    m_Duration: 1.266666666666667
     m_TimeScale: 1
     m_ParentTrack: {fileID: 1974707675077461547}
     m_EaseInDuration: 0
@@ -570,10 +605,10 @@ MonoBehaviour:
     m_PreExtrapolationTime: 0
     m_DisplayName: SentencePerformingClipAsset
   - m_Version: 1
-    m_Start: 4.833333333333333
+    m_Start: 5.75
     m_ClipIn: 0
     m_Asset: {fileID: -892459175646067939}
-    m_Duration: 1.1000000000000005
+    m_Duration: 1.5
     m_TimeScale: 1
     m_ParentTrack: {fileID: 1974707675077461547}
     m_EaseInDuration: 0
@@ -606,25 +641,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     m_MixOutCurve:
       serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+      m_Curve: []
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -639,10 +656,10 @@ MonoBehaviour:
     m_PreExtrapolationTime: 0
     m_DisplayName: SentencePerformingClipAsset
   - m_Version: 1
-    m_Start: 5.933333333333334
+    m_Start: 7.6666666666666625
     m_ClipIn: 0
     m_Asset: {fileID: 8938727916135784294}
-    m_Duration: 1.2666666666666666
+    m_Duration: 0.8166666666666664
     m_TimeScale: 1
     m_ParentTrack: {fileID: 1974707675077461547}
     m_EaseInDuration: 0
@@ -651,25 +668,7 @@ MonoBehaviour:
     m_BlendOutDuration: -1
     m_MixInCurve:
       serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+      m_Curve: []
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -746,6 +745,38 @@ MonoBehaviour:
   m_Loop: 0
   m_Version: 1
   m_Rotation: {x: 0, y: 0, z: 0, w: 1}
+--- !u!114 &6736280957185410658
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
+  m_Name: Signal Emitter
+  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Time: 9.183333333333328
+  m_Retroactive: 0
+  m_EmitOnce: 0
+  m_Asset: {fileID: 11400000, guid: bc45a814df23b78418bccc2a6e4bd059, type: 2}
+--- !u!114 &7243877592034343962
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
+  m_Name: Signal Emitter
+  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Time: 8.733333333333333
+  m_Retroactive: 0
+  m_EmitOnce: 1
+  m_Asset: {fileID: 11400000, guid: 0b38229900bac9d4ba93378e8fd66605, type: 2}
 --- !u!114 &8938727916135784294
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -1,0 +1,190 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-2448951469469920668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a32a464d8ccff4e40a60c45b40a1e648, type: 3}
+  m_Name: Sentence Node
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::cherrydev.SentenceNode
+  NodeGraph: {fileID: 11400000}
+  Rect:
+    serializedVersion: 2
+    x: 1022.66675
+    y: 266
+    width: 190
+    height: 135
+  IsDragging: 1
+  IsSelected: 0
+  _sentence:
+    CharacterName: "\u0420\u0430\u0446\u0438\u044F"
+    Text: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439 \u0441 \u0443\u043C\u043E\u043C"
+    CharacterSprite: {fileID: 6776718267575070786, guid: 1b7600162da0e3340a0a19b24651d5bb, type: 3}
+  ParentNodes: []
+  ChildNode: {fileID: 0}
+  _isExternalFunc: 0
+  _externalFunctionName: 
+  CharacterNameKey: 
+  SentenceTextKey: 
+--- !u!114 &-2202685895687706218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a32a464d8ccff4e40a60c45b40a1e648, type: 3}
+  m_Name: Sentence Node
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::cherrydev.SentenceNode
+  NodeGraph: {fileID: 11400000}
+  Rect:
+    serializedVersion: 2
+    x: 503.33347
+    y: 258
+    width: 190
+    height: 135
+  IsDragging: 1
+  IsSelected: 0
+  _sentence:
+    CharacterName: "\u0420\u0430\u0446\u0438\u044F"
+    Text: "\u0420\u044B\u0447\u0430\u0433 \u043F\u043E\u043A\u0430\u0436\u0435\u0442
+      \u043E\u0433\u0440\u043E\u043C\u043D\u044B\u043C \u043F\u0440\u043E\u0436\u0435\u043A\u0442\u043E\u0440\u043E\u043C,
+      \u0447\u0442\u043E \u0432\u044B \u0435\u0449\u0435 \u0436\u0438\u0432\u044B
+      \u0438 \u043C\u044B \u043F\u0440\u043E\u0434\u043B\u0438\u043C \u0442\u0430\u0439\u043C\u0435\u0440."
+    CharacterSprite: {fileID: 6776718267575070786, guid: 1b7600162da0e3340a0a19b24651d5bb, type: 3}
+  ParentNodes: []
+  ChildNode: {fileID: 0}
+  _isExternalFunc: 0
+  _externalFunctionName: 
+  CharacterNameKey: 
+  SentenceTextKey: 
+--- !u!114 &-2180225546734971085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a32a464d8ccff4e40a60c45b40a1e648, type: 3}
+  m_Name: Sentence Node
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::cherrydev.SentenceNode
+  NodeGraph: {fileID: 11400000}
+  Rect:
+    serializedVersion: 2
+    x: 211.3335
+    y: 256.66663
+    width: 190
+    height: 135
+  IsDragging: 1
+  IsSelected: 0
+  _sentence:
+    CharacterName: "\u0420\u0430\u0446\u0438\u044F"
+    Text: "\u0415\u0441\u043B\u0438 \u043A \u043D\u0438\u043C \u043F\u043E\u0434\u043E\u0439\u0442\u0438
+      \u0438 \u043D\u0430\u0436\u0430\u0442\u044C F, \u0432\u044B \u0447\u0442\u043E-\u0442\u043E
+      \u0441\u0434\u0435\u043B\u0430\u0435\u0442\u0435"
+    CharacterSprite: {fileID: 6776718267575070786, guid: 1b7600162da0e3340a0a19b24651d5bb, type: 3}
+  ParentNodes: []
+  ChildNode: {fileID: 0}
+  _isExternalFunc: 0
+  _externalFunctionName: 
+  CharacterNameKey: 
+  SentenceTextKey: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33f741ea10ebcf842a91c9b871dd032a, type: 3}
+  m_Name: Traning4
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::cherrydev.DialogNodeGraph
+  NodesList:
+  - {fileID: 2267719439088061794}
+  - {fileID: -2180225546734971085}
+  - {fileID: -2202685895687706218}
+  - {fileID: 4409576312687689282}
+  - {fileID: -2448951469469920668}
+  VariablesConfig: {fileID: 0}
+  _localizationTableName: 
+  _characterNamesLocalizationName: 
+  NodeToDrawLineFrom: {fileID: 0}
+  LinePosition: {x: 0, y: 0}
+  IsLocalizationSetUp: 0
+--- !u!114 &2267719439088061794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a32a464d8ccff4e40a60c45b40a1e648, type: 3}
+  m_Name: Sentence Node
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::cherrydev.SentenceNode
+  NodeGraph: {fileID: 11400000}
+  Rect:
+    serializedVersion: 2
+    x: -103.333176
+    y: 251.99994
+    width: 190
+    height: 135
+  IsDragging: 0
+  IsSelected: 0
+  _sentence:
+    CharacterName: "\u0420\u0430\u0446\u0438\u044F"
+    Text: "\u0412\u0430\u043C \u0431\u0443\u0434\u0443\u0442 \u0432\u0441\u0442\u0440\u0435\u0447\u0430\u0442\u0441\u044F
+      \u0438\u043D\u0442\u0435\u0440\u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0435
+      \u043E\u0431\u044C\u0435\u043A\u0442\u044B."
+    CharacterSprite: {fileID: 6776718267575070786, guid: 1b7600162da0e3340a0a19b24651d5bb, type: 3}
+  ParentNodes: []
+  ChildNode: {fileID: 0}
+  _isExternalFunc: 0
+  _externalFunctionName: 
+  CharacterNameKey: 
+  SentenceTextKey: 
+--- !u!114 &4409576312687689282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a32a464d8ccff4e40a60c45b40a1e648, type: 3}
+  m_Name: Sentence Node
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::cherrydev.SentenceNode
+  NodeGraph: {fileID: 11400000}
+  Rect:
+    serializedVersion: 2
+    x: 763.3335
+    y: 262
+    width: 190
+    height: 135
+  IsDragging: 0
+  IsSelected: 0
+  _sentence:
+    CharacterName: "\u0420\u0430\u0446\u0438\u044F"
+    Text: "\u041E\u0433\u0440\u043E\u043C\u043D\u0430\u044F \u0431\u0430\u043D\u0434\u0443\u0440\u0430
+      \u043C\u043E\u0436\u0435\u0442 \u0432\u044B\u0434\u0430\u0442\u044C \u0442\u0435\u0431\u0435
+      \u043C\u043E\u0434\u0438\u0444\u0438\u043A\u0430\u0442\u043E\u0440"
+    CharacterSprite: {fileID: 6776718267575070786, guid: 1b7600162da0e3340a0a19b24651d5bb, type: 3}
+  ParentNodes: []
+  ChildNode: {fileID: 0}
+  _isExternalFunc: 0
+  _externalFunctionName: 
+  CharacterNameKey: 
+  SentenceTextKey: 
