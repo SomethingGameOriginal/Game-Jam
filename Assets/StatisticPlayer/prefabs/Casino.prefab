@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5989536470467667912}
   - component: {fileID: 8284215261667776024}
   - component: {fileID: 6552848726455553804}
+  - component: {fileID: 2280000540973515337}
   m_Layer: 7
   m_Name: Casino
   m_TagString: Wall
@@ -29,8 +30,8 @@ Transform:
   m_GameObject: {fileID: 8183884021266677258}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.31, y: 9.05, z: 0}
-  m_LocalScale: {x: 5.7906, y: 3.3127, z: 1}
+  m_LocalPosition: {x: -5.5514, y: 8.5617, z: 0}
+  m_LocalScale: {x: 4.9362645, y: 5.28457, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -84,7 +85,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 4399295510402085014, guid: 845c12676acbb1343b2d8f6f99d795e0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -110,6 +111,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b7358033a41128949ab3ae4341dc5e47, type: 2}
   destroyAfterUse: 0
   notification: {fileID: 0}
+  animator: {fileID: 2280000540973515337}
+  activateTriggerName: Activate
+  animationDuration: 0.5
 --- !u!70 &8284215261667776024
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -185,7 +189,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.78, y: 0.94}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -193,3 +197,25 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!95 &2280000540973515337
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8183884021266677258}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 29629dab8cf95ed4983b6735b83e33ac, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

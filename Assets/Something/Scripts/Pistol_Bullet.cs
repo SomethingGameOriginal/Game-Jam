@@ -39,6 +39,8 @@ public class Pistol_Bullet : MonoBehaviour
     private int bouncesLeft;
     private bool leftShooterCollider;
 
+    private float extraDamage = 0f;
+
     Rigidbody2D rb;
     Vector2 direction;
     float currentSpeed;
@@ -48,6 +50,13 @@ public class Pistol_Bullet : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         currentSpeed = speed;
         bouncesLeft = maxBounces;
+
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            var bonus = player.GetComponent<BulletDamageBonus>();
+            if (bonus != null) extraDamage = bonus.bonusDamage;
+        }
     }
 
     public void Shoot(Vector2 shootDirection)
@@ -97,7 +106,8 @@ public class Pistol_Bullet : MonoBehaviour
         EnemyChase2D enemy = collision.GetComponentInParent<EnemyChase2D>();
         if (enemy != null)
         {
-            enemy.TakeDamage(damage);
+            int totalDamage = damage + Mathf.RoundToInt(extraDamage);
+            enemy.TakeDamage(totalDamage);
 
             if (!isClone)
                 SpawnClones(collision);

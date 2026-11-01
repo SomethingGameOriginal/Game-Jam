@@ -9,8 +9,18 @@ public class RandomModifierPickup : MonoBehaviour
 
     [SerializeField] private ModifierNotification notification;
 
+    [Header("Animation")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private string activateTriggerName = "Activate";
+    [SerializeField] private float animationDuration = 0.5f;
+
     private bool used;
 
+    private void Awake()
+    {
+        if (animator == null)
+            animator = GetComponent<Animator>();
+    }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -21,7 +31,6 @@ public class RandomModifierPickup : MonoBehaviour
             {
                 Activate(collision.gameObject.GetComponent<PlayerStats>());
             }
-            
         }
     }
 
@@ -46,10 +55,17 @@ public class RandomModifierPickup : MonoBehaviour
 
         Debug.Log($"Получен модификатор: {modifier.modifierName}");
 
-        if (destroyAfterUse)
-            Destroy(gameObject);
+        // Отключаем коллайдер, чтобы нельзя было активировать повторно
+        var col = GetComponent<Collider2D>();
+        if (col != null)
+            col.enabled = false;
 
-        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+        // Запускаем анимацию
+        if (animator != null && !string.IsNullOrEmpty(activateTriggerName))
+            animator.SetTrigger(activateTriggerName);
+
+        if (destroyAfterUse)
+            Destroy(gameObject, animationDuration);
     }
 
     private void ApplyModifier(PlayerStats stats, PlayerModifier modifier)
