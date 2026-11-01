@@ -1,4 +1,5 @@
 // Editor/SkillTreeLayoutEditor.cs
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -513,3 +514,4 @@ public class SkillTreeLayoutEditor : EditorWindow
         Debug.Log("Skill tree saved.");
     }
 }
+#endif
