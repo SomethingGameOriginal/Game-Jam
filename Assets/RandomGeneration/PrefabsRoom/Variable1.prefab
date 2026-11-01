@@ -121,6 +121,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 739731041838795075}
     m_Modifications:
+    - target: {fileID: 447441211299049572, guid: 8ac6e9cb35ae2e24e8052af9ba2400cc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2063864519897137034, guid: 8ac6e9cb35ae2e24e8052af9ba2400cc, type: 3}
       propertyPath: m_Name
       value: Room1
