@@ -14,6 +14,8 @@ public class PistolController : MonoBehaviour
     public Transform leftFirePoint;
     public Transform rightFirePoint;
 
+    public GameTimer gameTimer;
+
     public PlayerController playerController;
 
     void Start()
@@ -62,6 +64,8 @@ public class PistolController : MonoBehaviour
             Vector2 shootDirection = (mainCamera.ScreenToWorldPoint(Input.mousePosition) - firePoint.position).normalized; // direction ошибку выдаёт
             
             bullet.GetComponent<Pistol_Bullet>().Shoot(shootDirection);
+
+            gameTimer.LessTime(3);
         }
     }
 

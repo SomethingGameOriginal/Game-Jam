@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 4483317618698708443}
   - component: {fileID: 3485309441502998598}
   - component: {fileID: 1775361608639451272}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Sniper
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -246,7 +246,7 @@ MonoBehaviour:
   firePoint: {fileID: 1737833689659081555}
   fireRate: 0.5
   projectileSpeed: 12
-  projectileDamage: 1
+  projectileDamage: 15
 --- !u!1 &5493743540505735333
 GameObject:
   m_ObjectHideFlags: 0

@@ -80,6 +80,13 @@ public class EnemyChase2D : MonoBehaviour
 
         bool seeing = FindPlayer();
 
+        if (player == null)
+        {
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
+                player = playerObject.transform;
+        }
+
         if (seeing)
         {
             LastKnownPlayerPosition = player.position;

@@ -45,9 +45,9 @@ GameObject:
   - component: {fileID: 3371314012439090470}
   - component: {fileID: 7952999134633655937}
   - component: {fileID: 1909299640465986596}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: RangedEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -259,7 +259,7 @@ MonoBehaviour:
   searchArrivalDistance: 0.2
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 128
   obstacleCheckDistance: 1
   obstacleRadius: 0.25
   wallFollowDuration: 1.2
@@ -267,7 +267,7 @@ MonoBehaviour:
   enemySpacing: 3
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 512
   separationWeight: 2
   showGizmos: 1
   desiredDistance: 3.7
@@ -278,6 +278,6 @@ MonoBehaviour:
   fireRate: 1
   projectileSpeed: 8
   projectileDamage: 10
-  obstacleLayers:
+  shootObstacleLayers:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 0

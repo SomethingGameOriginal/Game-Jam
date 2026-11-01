@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class TimeExtender : MonoBehaviour
 {
-    [SerializeField] private float secondsToAdd = 15f;
+    [SerializeField] private float secondsToAdd = 60f;
     [SerializeField] private bool oneUse = true;
     [SerializeField] private Sprite loss;
     [SerializeField] private Animator anim;

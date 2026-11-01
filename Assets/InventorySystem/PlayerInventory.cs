@@ -119,7 +119,8 @@ public class PlayerInventory : MonoBehaviour
             return;
 
         // Подключите здесь лечение или снятие отравления.
-        Debug.Log($"Использован {item.itemName}. Лечение: {item.healthRestored}");
+        gameObject.GetComponent<PlayerStats>().HealPoisonous(15);
+        gameObject.GetComponent<PlayerStats>().Heal(15);
 
         RemoveItem(selectedSlot);
     }
