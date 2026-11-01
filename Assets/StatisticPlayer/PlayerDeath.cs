@@ -10,7 +10,7 @@ public class PlayerDeath : MonoBehaviour
 
     [Header("Тайминги")]
     [Tooltip("Через сколько секунд после смерти перезапустить сцену")]
-    [SerializeField] private float restartDelay = 5f;
+    [SerializeField] private float restartDelay = 0;
 
     [Header("Блокировка управления")]
     [Tooltip("Компоненты, которые нужно выключить при смерти (например, PlayerMovement, GroundSlamAbility)")]
