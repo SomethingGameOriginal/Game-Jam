@@ -54,6 +54,12 @@ public class PlayerStats : MonoBehaviour
         UpdateUI();
     }
 
+    public void HealPoisonous(float amount)
+    {
+        infection = Mathf.Min(currentMaxHealth, infection - amount);
+        UpdateUI();
+    }
+
     public void ReduceInfection(float amount)
     {
         infection = Mathf.Max(0f, infection - amount);

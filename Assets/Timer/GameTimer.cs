@@ -39,6 +39,14 @@ public class GameTimer : MonoBehaviour
         UpdateDisplay();
     }
 
+    public void LessTime(float seconds)
+    {
+        if (seconds > 0f)
+            timeLeft -= seconds;
+
+        UpdateDisplay();
+    }
+
     private void UpdateDisplay()
     {
         if (timerText != null)

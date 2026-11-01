@@ -79,7 +79,7 @@ public class ChaserEnemy : EnemyChase2D
         float distance = Vector2.Distance(rb.position, PlayerPosition);
 
         if (distance > stopDistance)
-            MoveInDirection(GetDirectionTo(PlayerPosition));
+            MoveInDirection(GetMoveDirection(PlayerPosition));
         else
             StopMoving();
     }

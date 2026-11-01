@@ -14,75 +14,55 @@ public class RangedEnemy : EnemyChase2D
     [SerializeField] private float projectileSpeed = 8f;
     [SerializeField] private int projectileDamage = 1;
 
-    [SerializeField] private LayerMask obstacleLayers;
+    [Header("Препятствия для выстрела")]
+    [Tooltip("Слои стен/препятствий. Должно быть НЕ пусто, иначе HasClearShot всегда false.")]
+    [SerializeField] private LayerMask shootObstacleLayers;
 
     private float fireTimer;
 
-    /// <summary>
-    /// Есть ли чистая линия до игрока (без стен между firePoint и игроком).
-    /// Враги и собственные коллайдеры выстрел НЕ блокируют.
-    /// </summary>
-    private bool HasClearShot(out Vector2 direction)
+    protected override void FixedUpdate()
     {
-        Vector2 origin = firePoint != null
-            ? (Vector2)firePoint.position
-            : rb.position;
+        bool seeing = FindPlayer();
 
-        Vector2 offset = (Vector2)player.position - origin;
 
-        if (offset.sqrMagnitude < 0.001f)
+        if (!seeing)
         {
-            direction = Vector2.zero;
-            return false;
+            StopMoving();
+            return;
         }
 
-        direction = offset.normalized;
-
-        if (obstacleLayer.value == 0)
-            return false;
-
-        RaycastHit2D[] hits = Physics2D.RaycastAll(
-            origin,
-            direction,
-            offset.magnitude,
-            obstacleLayer
-        );
-
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.collider == null)
-                continue;
-
-            Transform hitTransform = hit.collider.transform;
-
-            // Не учитываем коллайдеры самого врага.
-            if (hitTransform == transform || hitTransform.IsChildOf(transform))
-                continue;
-
-            // Попали в стену — чистого выстрела нет.
-            return false;
-        }
-
-        return true;
+        UpdateStuckTimer();
+        OnPlayerVisible();
     }
 
     protected override void OnPlayerVisible()
     {
+        if (player == null)
+        {
+            StopMoving();
+            return;
+        }
+
         Vector2 playerPos = player.position;
         Vector2 toPlayer = playerPos - rb.position;
         float distance = toPlayer.magnitude;
+
         bool hasShot = HasClearShot(out Vector2 shotDir);
 
+        // --- Движение ---
         if (distance > desiredDistance + distanceTolerance)
         {
+            // Слишком далеко — сближаемся.
             MoveInDirection(GetMoveDirection(playerPos));
         }
         else if (hasShot && distance < desiredDistance - distanceTolerance)
         {
+            // Слишком близко, но стрелять можем — отступаем.
             MoveInDirection(GetRetreatDirection(-toPlayer));
         }
         else if (!hasShot && distance > minApproachDistance)
         {
+            // Стены мешают — подходим, чтобы найти угол.
             MoveInDirection(GetMoveDirection(playerPos));
         }
         else
@@ -90,6 +70,7 @@ public class RangedEnemy : EnemyChase2D
             StopMoving();
         }
 
+        // --- Стрельба ---
         if (hasShot)
         {
             fireTimer -= Time.fixedDeltaTime;
@@ -106,10 +87,69 @@ public class RangedEnemy : EnemyChase2D
         }
     }
 
+    private bool HasClearShot(out Vector2 direction)
+    {
+        direction = Vector2.zero;
+
+        if (player == null)
+            return false;
+
+        Vector2 origin = firePoint != null
+            ? (Vector2)firePoint.position
+            : rb.position;
+
+        Vector2 offset = (Vector2)player.position - origin;
+
+        if (offset.sqrMagnitude < 0.001f)
+            return false;
+
+        direction = offset.normalized;
+
+        // Если слой препятствий не задан — считаем, что стрелять можно
+        // (иначе враг вообще никогда не выстрелит при пустом поле).
+        LayerMask mask = shootObstacleLayers.value != 0
+            ? shootObstacleLayers
+            : obstacleLayer;
+
+        if (mask.value == 0)
+            return true;
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(
+            origin,
+            direction,
+            offset.magnitude,
+            mask
+        );
+
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.collider == null)
+                continue;
+
+            Transform hitTransform = hit.collider.transform;
+
+            // Свои коллайдеры игнорируем.
+            if (hitTransform == transform || hitTransform.IsChildOf(transform))
+                continue;
+
+            // Игрок — не препятствие.
+            if (hitTransform == player || hitTransform.IsChildOf(player))
+                continue;
+
+            // Попали в стену.
+            return false;
+        }
+
+        return true;
+    }
+
     private void Shoot(Vector2 direction)
     {
         if (projectilePrefab == null || firePoint == null)
+        {
+            Debug.LogWarning($"[RangedEnemy] Не назначен {(projectilePrefab == null ? "Projectile Prefab" : "Fire Point")} на {name}", this);
             return;
+        }
 
         GameObject projectile = Instantiate(
             projectilePrefab,

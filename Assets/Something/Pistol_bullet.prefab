@@ -180,3 +180,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pistol_Bullet
   speed: 20
+  damage: 10
+  enemyTag: Enemy
+  cloneCount: 5
+  cloneSpreadAngle: 60
+  cloneSpeedMultiplier: 1
+  cloneLifetime: 3
+  cloneSpawnOffset: 1.2
+  cloneForwardOffset: 0.3
+  maxBounces: 10
+  bounceSpeedMultiplier: 1
+  minBounceSpeed: 1
+  damagePlayer: 1
