@@ -47,6 +47,11 @@ public class GameTimer : MonoBehaviour
         UpdateDisplay();
     }
 
+    public float GetTime()
+    {
+        return timeLeft;
+    }
+
     private void UpdateDisplay()
     {
         if (timerText != null)

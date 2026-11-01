@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class RootMotionController : MonoBehaviour
 {
-    private Animator _animator;
+    public Animator _animator;
 
     private void Awake()
     {
@@ -40,6 +40,7 @@ public class RootMotionController : MonoBehaviour
         if (_animator != null)
         {
             _animator.applyRootMotion = enable;
+            Debug.Log("SS");    
         }
     }
 }

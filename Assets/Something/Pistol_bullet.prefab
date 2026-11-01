@@ -267,13 +267,15 @@ MonoBehaviour:
   speed: 20
   damage: 10
   enemyTag: Enemy
-  cloneCount: 5
+  cloneCount: 0
   cloneSpreadAngle: 60
   cloneSpeedMultiplier: 1
   cloneLifetime: 3
   cloneSpawnOffset: 1.5
   cloneForwardOffset: 0.3
+  cloneBounces: -1
   maxBounces: 10
   bounceSpeedMultiplier: 1
   minBounceSpeed: 1
+  bounceSeparation: 0.1
   damagePlayer: 1
