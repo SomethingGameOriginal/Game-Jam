@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PistolController : MonoBehaviour
@@ -7,6 +8,10 @@ public class PistolController : MonoBehaviour
 
     public Transform PistolLeft;
     public Transform PistolRight;
+
+    public GameObject leftLight;
+    public GameObject rightLight;
+    public float lightDuration;
 
     Camera mainCamera;
 
@@ -59,6 +64,10 @@ public class PistolController : MonoBehaviour
             Transform firePoint = mouseOnRight ? rightFirePoint : leftFirePoint;
             firePoint.GetComponent<Animator>().Play("Fire", 0, 0);
 
+            GameObject lightPoint = mouseOnRight ? rightLight : leftLight;
+            lightPoint.gameObject.SetActive(true);
+            StartCoroutine(DisableLight(lightPoint));
+
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
             Vector2 shootDirection = (mainCamera.ScreenToWorldPoint(Input.mousePosition) - firePoint.position).normalized; // direction ошибку выдаёт
@@ -66,7 +75,12 @@ public class PistolController : MonoBehaviour
             bullet.GetComponent<Pistol_Bullet>().Shoot(shootDirection);
 
             gameTimer.LessTime(3);
+            
         }
     }
-
+    IEnumerator DisableLight(GameObject lightPoint)
+    {
+        yield return new WaitForSeconds(lightDuration);
+        lightPoint.gameObject.SetActive(false);
+    }
 }
