@@ -506,7 +506,7 @@ MonoBehaviour:
   roomPrefabs:
   - {fileID: 42638182037961768, guid: 8ac6e9cb35ae2e24e8052af9ba2400cc, type: 3}
   BossLocation: {fileID: 6799962821988425923, guid: 41422cc84a6af8747b83e5ec314f6427, type: 3}
-  roomCount: 10
+  roomCount: 20
   roomLength: 60
   prefabLength: 60
   generatedParent: {fileID: 403549570}
@@ -922,6 +922,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6282226989604062755, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1997743360}
+    - targetCorrespondingSourceObject: {fileID: 6282226989604062755, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1997743361}
   m_SourcePrefab: {fileID: 100100000, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
 --- !u!1 &740979144
 GameObject:
@@ -9623,6 +9626,30 @@ MonoBehaviour:
   descriptionText: {fileID: 939525454}
   fadeDuration: 0.35
   visibleDuration: 2.5
+--- !u!114 &1997743361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1997743350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c932d4c8bc739a844a25d46911c1bce4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroundSlamAbility
+  requiredInfection: 50
+  activationKey: 99
+  damageRadius: 4
+  damage: 100
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  cooldown: 3
+  shockwaveDuration: 0.25
+  infectionPerTick: 2
+  secondsPerTick: 1
+  effectDuration: 5
 --- !u!1 &2034545808
 GameObject:
   m_ObjectHideFlags: 0

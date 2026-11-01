@@ -19,11 +19,15 @@ public class PlayerStats : MonoBehaviour
     private float infection;
     private float infectionTimer;
 
+    // Добавить в PlayerStats
+    public float Infection => infection;
+    public bool IsAlive => health > 0f;
+
     private void Start()
     {
         currentMaxHealth = maxHealth;
         health = currentMaxHealth;
-        infection = 0f;
+        infection = 51f;
         UpdateUI();
     }
 
