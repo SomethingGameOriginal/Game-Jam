@@ -224,7 +224,7 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 256
-  sightRadius: 8
+  sightRadius: 20
   searchDuration: 3
   searchArrivalDistance: 0.2
   obstacleLayer:
@@ -240,9 +240,9 @@ MonoBehaviour:
     m_Bits: 512
   separationWeight: 2
   showGizmos: 1
-  attackRange: 4
+  attackRange: 5
   timeBetweenAttacks: 0.5
-  stompRadius: 1
+  stompRadius: 2
   stompDamage: 20
   stompWindup: 0.7
   stompTargetLayer:

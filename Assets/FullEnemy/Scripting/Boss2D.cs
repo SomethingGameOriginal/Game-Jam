@@ -45,8 +45,26 @@ public class Boss2D : EnemyChase2D
         attackTimer = timeBetweenAttacks;
     }
 
+    // ⬇️ КЛЮЧЕВОЕ: пока игрок в радиусе атаки — стоим и не преследуем.
+    // Вне радиуса — ведём себя как обычный преследователь.
+    protected override void OnPlayerVisible()
+    {
+        float distance = Vector2.Distance(rb.position, PlayerPosition);
+
+        if (distance <= attackRange)
+        {
+            StopMoving();
+            return;
+        }
+
+        // Игрок далеко — пусть базовый класс преследует.
+        base.OnPlayerVisible();
+    }
+
     protected override void FixedUpdate()
     {
+        // Базовый FixedUpdate управляет поиском/преследованием и вызывает
+        // OnPlayerVisible(), который мы переопределили выше.
         base.FixedUpdate();
 
         if (isAttacking || !HasPlayer)
@@ -90,7 +108,6 @@ public class Boss2D : EnemyChase2D
             stompTargetLayer
         );
 
-        // Не наносить урон несколько раз игроку с несколькими коллайдерами.
         HashSet<PlayerStats> damagedPlayers = new HashSet<PlayerStats>();
 
         foreach (Collider2D target in targets)
@@ -138,8 +155,6 @@ public class Boss2D : EnemyChase2D
 
         Vector2 centerDirection = toPlayer.normalized;
 
-        // Последовательно выпускаем countOfBullet снарядов
-        // в каждом направлении: центральном и двух боковых.
         float[] angles = { 0f, -sideShotAngle, sideShotAngle };
 
         foreach (float angle in angles)
