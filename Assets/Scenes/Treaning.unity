@@ -903,9 +903,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6282226989604062755, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1997743351}
-    - targetCorrespondingSourceObject: {fileID: 5704606394341751409, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1970512251}
   m_SourcePrefab: {fileID: 100100000, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
 --- !u!1001 &729478501
 PrefabInstance:
@@ -4224,31 +4221,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1949198810}
   m_CullTransparentMesh: 1
---- !u!1 &1970512248 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5704606394341751409, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
+--- !u!114 &1970512250 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7904192888053321912, guid: 1a783423c3fb4aa43b919cd6e7df04fc, type: 3}
   m_PrefabInstance: {fileID: 629927369}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1970512251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1970512248}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e783fce1b5435346b0c6f44e6a25dfe, type: 3}
+  m_Script: {fileID: 11500000, guid: 1b803cbc5d771fe49ad809745d77e11f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventoryItem
-  itemName: 
-  description: 
-  type: 0
-  icon: {fileID: 4319395737909131107, guid: f1a819dc62fee4845b7d68da801938dc, type: 3}
-  pickupPrefab: {fileID: 0}
-  weaponId: 0
-  weaponPrefab: {fileID: 0}
-  healthRestored: 1
+  m_EditorClassIdentifier: Assembly-CSharp::PistolController
 --- !u!1 &1974542271
 GameObject:
   m_ObjectHideFlags: 0
@@ -4429,7 +4412,7 @@ MonoBehaviour:
   detailsPanel: {fileID: 1294583567}
   detailsUI: {fileID: 1294583569}
   dropDistance: 2
-  pistolController: {fileID: 0}
+  pistolController: {fileID: 1970512250}
 --- !u!114 &1997743352
 MonoBehaviour:
   m_ObjectHideFlags: 0
