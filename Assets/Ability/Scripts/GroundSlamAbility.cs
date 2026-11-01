@@ -21,6 +21,20 @@ public class GroundSlamAbility : MonoBehaviour
     [SerializeField] private float secondsPerTick = 1f;
     [SerializeField] private float effectDuration = 5f;
 
+    // --- Публичный API для UI / индикатора радиуса ---
+    public float RequiredInfection => requiredInfection;
+    public float DamageRadius => damageRadius;
+    public float CooldownRemaining => Mathf.Max(0f, cooldownTimer);
+    public float CooldownTotal => cooldown;
+    public bool HasEnoughInfection => stats != null && stats.Infection >= requiredInfection;
+    public bool IsActivePublic() => isActive;
+
+    public bool CanActivatePublic() =>
+        IsUnlocked && !isActive && cooldownTimer <= 0f && HasEnoughInfection;
+
+    [Header("Ссылки")]
+    [SerializeField] private RadiusIndicator radiusIndicator;
+
     private PlayerStats stats;
     private float cooldownTimer;
     private bool isActive;
@@ -88,37 +102,31 @@ public class GroundSlamAbility : MonoBehaviour
         isActive = true;
         cooldownTimer = cooldown;
 
+
         StartCoroutine(SlamRoutine());
         StartCoroutine(InfectionPenaltyRoutine());
     }
 
     private IEnumerator SlamRoutine()
     {
-        // Простой визуальный «толчок» (можно заменить на реальный эффект/анимацию)
+        // Ждём момент удара в твоей анимации
+        yield return new WaitForSeconds(0.4f); // <- подгони под свой клип
+
+        if (radiusIndicator != null)
+            radiusIndicator.PlaySlamAnimation();
+
         Debug.Log("[GroundSlamAbility] Удар по земле!");
 
         Vector2 center = transform.position;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(center, damageRadius, enemyLayer);
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(
-            center,
-            damageRadius,
-            enemyLayer
-        );
-
+        var damaged = new System.Collections.Generic.HashSet<EnemyChase2D>();
         foreach (Collider2D hit in hits)
         {
             if (hit == null) continue;
-
-            // Пробуем найти EnemyChase2D (или наследника — RangedEnemy и т.п.)
             EnemyChase2D enemy = hit.GetComponentInParent<EnemyChase2D>();
-            if (enemy != null)
-            {
+            if (enemy != null && damaged.Add(enemy))
                 enemy.TakeDamage(damage);
-                continue;
-            }
-
-            // Запасной вариант — любой компонент с методом TakeDamage(int)
-            // если у вас несколько типов врагов.
         }
 
         yield return new WaitForSeconds(shockwaveDuration);
