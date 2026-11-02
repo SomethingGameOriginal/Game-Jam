@@ -266,7 +266,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pistol_Bullet
   speed: 20
   damage: 10
-  enemyTag: Enemy
+  enemyTag: Wall
   cloneCount: 0
   cloneSpreadAngle: 60
   cloneSpeedMultiplier: 1
@@ -279,3 +279,4 @@ MonoBehaviour:
   minBounceSpeed: 1
   bounceSeparation: 0.1
   damagePlayer: 1
+  playerDamageDelay: 0.05

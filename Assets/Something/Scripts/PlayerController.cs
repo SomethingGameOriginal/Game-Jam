@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections; // Обязательно для использования корутин
 
 public class PlayerController : MonoBehaviour
 {
@@ -22,12 +23,24 @@ public class PlayerController : MonoBehaviour
 
     // [+] --- Звук шагов ---
     [Header("Звук шагов")]
-    public AudioSource footstepSource;      // AudioSource для шагов
-    public AudioClip[] footstepClips;       // Массив звуков шагов (2-5 штук)
-    public float stepInterval = 0.35f;      // Интервал между шагами (сек)
-    private float stepTimer;                // Таймер до следующего шага
-    private int lastStepIndex = -1;         // Индекс прошлого звука
-    // [-
+    public AudioSource footstepSource;
+    public AudioClip[] footstepClips;
+    public float stepInterval = 0.35f;
+    private float stepTimer;
+    private int lastStepIndex = -1;
+    // [-]
+
+    // [+] --- Звуки рывка ---
+    [Header("Звуки рывка")]
+    public AudioSource dashSource;          // Источник звука для рывка (можно оставить тем же или выдать отдельный)
+    public AudioClip[] dashStartClips;      // Звуки, играющие СРАЗУ при рывке
+    public AudioClip[] dashDelayClips;      // Звуки, играющие С ЗАТЯЖКОЙ (позже) во время рывка
+    public float dashSoundDelay = 0.08f;    // Задержка перед вторым звуком (в секундах)
+
+    private int lastDashStartIndex = -1;
+    private int lastDashDelayIndex = -1;
+
+    // [-]
 
     void Start()
     {
@@ -35,9 +48,12 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        // [+] Автопоиск AudioSource, если не назначен вручную
         if (footstepSource == null)
             footstepSource = GetComponent<AudioSource>();
+
+        // Автопоиск AudioSource для рывка, если не назначен
+        if (dashSource == null)
+            dashSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -71,8 +87,6 @@ public class PlayerController : MonoBehaviour
         }
 
         PlayerAnimation();
-
-        // [+] Обновление звука шагов
         UpdateFootsteps();
     }
 
@@ -96,6 +110,15 @@ public class PlayerController : MonoBehaviour
             dashDir = lastMove;
 
         animator.Play("Dash");
+
+        // [+] Воспроизведение звуков рывка
+        PlayRandomDashStartSound();
+
+        if (dashDelayClips != null && dashDelayClips.Length > 0)
+        {
+            // Запускаем корутину для воспроизведения звука с задержкой
+            StartCoroutine(PlayDelayedDashSoundRoutine());
+        }
     }
 
     void PlayerAnimation()
@@ -135,8 +158,6 @@ public class PlayerController : MonoBehaviour
 
         if (!isWalking)
         {
-            // Персонаж остановился — сбрасываем таймер,
-            // чтобы следующий шаг прозвучал сразу при начале движения
             stepTimer = 0f;
             return;
         }
@@ -154,27 +175,58 @@ public class PlayerController : MonoBehaviour
         if (footstepSource == null || footstepClips == null || footstepClips.Length == 0)
             return;
 
-        int index;
-
-        // Если звук один — просто играем его
-        if (footstepClips.Length == 1)
-        {
-            index = 0;
-        }
-        else
-        {
-            // Выбираем случайный индекс, отличный от предыдущего
-            do
-            {
-                index = Random.Range(0, footstepClips.Length);
-            } while (index == lastStepIndex);
-
-            lastStepIndex = index;
-        }
-
-        // Небольшой рандом питча — добавляет "живости"
+        int index = GetRandomClipIndex(footstepClips.Length, ref lastStepIndex);
         footstepSource.pitch = Random.Range(0.92f, 1.08f);
         footstepSource.PlayOneShot(footstepClips[index]);
     }
-    // [-
+    // [-]
+
+    // [+] --- Логика звуков рывка ---
+    IEnumerator PlayDelayedDashSoundRoutine()
+    {
+        // Ждем указанное время перед включением второго звука
+        yield return new WaitForSeconds(dashSoundDelay);
+
+        // Проверяем, что персонаж всё еще совершает рывок (на всякий случай)
+        if (isDashing)
+        {
+            PlayRandomDashDelaySound();
+        }
+    }
+
+    void PlayRandomDashStartSound()
+    {
+        if (dashSource == null || dashStartClips == null || dashStartClips.Length == 0)
+            return;
+
+        int index = GetRandomClipIndex(dashStartClips.Length, ref lastDashStartIndex);
+        dashSource.pitch = Random.Range(0.92f, 1.08f);
+        dashSource.PlayOneShot(dashStartClips[index]);
+    }
+
+    void PlayRandomDashDelaySound()
+    {
+        if (dashSource == null || dashDelayClips == null || dashDelayClips.Length == 0)
+            return;
+
+        int index = GetRandomClipIndex(dashDelayClips.Length, ref lastDashDelayIndex);
+        dashSource.pitch = Random.Range(0.92f, 1.08f);
+        dashSource.PlayOneShot(dashDelayClips[index]);
+    }
+    // [-]
+
+    // Универсальный метод для выбора случайного элемента без повторения подряд
+    int GetRandomClipIndex(int length, ref int lastIndex)
+    {
+        if (length <= 1) return 0;
+
+        int index;
+        do
+        {
+            index = Random.Range(0, length);
+        } while (index == lastIndex);
+
+        lastIndex = index;
+        return index;
+    }
 }

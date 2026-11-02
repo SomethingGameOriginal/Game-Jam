@@ -40,6 +40,9 @@ public class Pistol_Bullet : MonoBehaviour
     private Vector2 direction;
     private float currentSpeed;
 
+    public float playerDamageDelay = 1f;
+    private float shootTime;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -50,6 +53,7 @@ public class Pistol_Bullet : MonoBehaviour
     public void Initialize(Vector2 shootDirection, float bonusDamage)
     {
         extraDamage = bonusDamage;
+        shootTime = Time.time;
         Shoot(shootDirection);
         initialized = true;
     }
@@ -57,6 +61,7 @@ public class Pistol_Bullet : MonoBehaviour
     public void Shoot(Vector2 shootDirection)
     {
         direction = shootDirection.normalized;
+        shootTime = Time.time;
     }
 
     public void MarkAsClone() => isClone = true;
@@ -85,12 +90,16 @@ public class Pistol_Bullet : MonoBehaviour
 
         if (playerStats != null)
         {
+            if (!damagePlayer)
+                return;
+
             if (!leftShooterCollider)
                 return;
 
-            if (damagePlayer)
-                playerStats.TakeDamage(damage);
+            if (Time.time - shootTime < playerDamageDelay)
+                return;
 
+            playerStats.TakeDamage(damage);
             Destroy(gameObject);
             return;
         }

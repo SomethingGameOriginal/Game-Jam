@@ -32,6 +32,9 @@ public class PlayerDeath : MonoBehaviour
     [Header("Дебаг")]
     [SerializeField] private bool debug = true;
 
+    [Header("Звук смерти")]
+    [SerializeField] private AudioSource deathAudioSource;
+
     private bool isDead;
     private DeathCause lastCause;
     private string lastCauseDetails;
@@ -106,6 +109,10 @@ public class PlayerDeath : MonoBehaviour
             animator.ResetTrigger(deathTriggerName);
             animator.SetTrigger(deathTriggerName);
         }
+
+        // звук смерти
+        if (deathAudioSource != null)
+            deathAudioSource.Play();
 
         // пауза
         if (pauseOnDeath)
