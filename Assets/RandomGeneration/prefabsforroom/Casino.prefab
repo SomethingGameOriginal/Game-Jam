@@ -116,6 +116,8 @@ MonoBehaviour:
   animator: {fileID: 2472975333243895101}
   activateTriggerName: Activate
   animationDuration: 0.5
+  firstSound: {fileID: 8300000, guid: cdbfed5bed8e50c428321cece6a2bd60, type: 3}
+  secondSound: {fileID: 8300000, guid: c18beadbd76330144a5edd06c70ba9ce, type: 3}
 --- !u!61 &8438995609427899860
 BoxCollider2D:
   m_ObjectHideFlags: 0

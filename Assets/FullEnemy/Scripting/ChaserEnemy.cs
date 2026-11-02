@@ -31,6 +31,23 @@ public class ChaserEnemy : EnemyChase2D
     private int moveBoolHash;
     private int attackTriggerHash;
 
+    [Header("Звуки")]
+    [SerializeField] private AudioSource audioSource;
+
+    [Header("Ходьба")]
+    [SerializeField] private AudioClip[] walkSounds;
+    [SerializeField] private float walkSoundInterval = 0.4f;
+
+    [Header("Атака")]
+    [SerializeField] private AudioClip[] attackSounds;
+
+    [Header("Получение урона")]
+    [SerializeField] private AudioClip[] damageSounds;
+
+    [Header("Смерть")]
+    [SerializeField] private AudioClip[] deathSounds;
+
+    private float walkSoundTimer;
     protected override void Awake()
     {
         base.Awake();
@@ -115,6 +132,36 @@ public class ChaserEnemy : EnemyChase2D
     {
         if (animator != null)
             animator.SetBool(moveBoolHash, isMoving);
+
+        UpdateWalkSound(isMoving);
+    }
+
+    private void PlayRandomSound(AudioClip[] sounds)
+    {
+        if (audioSource == null || sounds.Length == 0)
+            return;
+
+        AudioClip clip = sounds[Random.Range(0, sounds.Length)];
+
+        if (clip != null)
+            audioSource.PlayOneShot(clip);
+    }
+
+    private void UpdateWalkSound(bool isMoving)
+    {
+        if (!isMoving)
+        {
+            walkSoundTimer = 0f;
+            return;
+        }
+
+        walkSoundTimer -= Time.fixedDeltaTime;
+
+        if (walkSoundTimer <= 0f)
+        {
+            PlayRandomSound(walkSounds);
+            walkSoundTimer = walkSoundInterval;
+        }
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -139,6 +186,7 @@ public class ChaserEnemy : EnemyChase2D
 
         // Наносим урон
         stats.TakeDamage(contactDamage);
+        PlayRandomSound(attackSounds);
 
         // Запускаем триггер анимации атаки
         if (animator != null)

@@ -1022,7 +1022,16 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e805cd02806ae834fa63d1cbf2b91100, type: 3}
   - {fileID: 8300000, guid: 91022f612596015479921bd6d02a7517, type: 3}
   - {fileID: 8300000, guid: 2949f0f4e6c95584399253021c0ab9ab, type: 3}
-  stepInterval: 0.5
+  stepInterval: 2
+  dashSource: {fileID: 0}
+  dashStartClips:
+  - {fileID: 8300000, guid: 2e43fa34684572b4d9811557e97fca41, type: 3}
+  - {fileID: 8300000, guid: 8b5ff0f0b9c29df47a857d308bd269ce, type: 3}
+  - {fileID: 8300000, guid: 4f5ab362687b7394f9432949d0abc1c0, type: 3}
+  dashDelayClips:
+  - {fileID: 8300000, guid: 7a88b0ed9e264d34995b085f821d9450, type: 3}
+  - {fileID: 8300000, guid: 790f69f3df6ebdd4b9cfee90efe413ce, type: 3}
+  dashSoundDelay: 0.08
 --- !u!95 &3190912101639997243
 Animator:
   serializedVersion: 7

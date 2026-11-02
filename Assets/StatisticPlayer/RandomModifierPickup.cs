@@ -14,12 +14,26 @@ public class RandomModifierPickup : MonoBehaviour
     [SerializeField] private string activateTriggerName = "Activate";
     [SerializeField] private float animationDuration = 0.5f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip firstSound;
+    [SerializeField] private AudioClip secondSound;
+
+    private AudioSource audioSource;
     private bool used;
 
     private void Awake()
     {
         if (animator == null)
             animator = GetComponent<Animator>();
+    }
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -60,12 +74,37 @@ public class RandomModifierPickup : MonoBehaviour
         if (col != null)
             col.enabled = false;
 
-        // Запускаем анимацию
-        if (animator != null && !string.IsNullOrEmpty(activateTriggerName))
-            animator.SetTrigger(activateTriggerName);
+        // Запускаем корутину для анимации и последовательного воспроизведения звуков
+        StartCoroutine(ActivateSequence());
+    }
 
+    private IEnumerator ActivateSequence()
+    {
+        // 1. Запускаем анимацию
+        if (animator != null && !string.IsNullOrEmpty(activateTriggerName))
+        {
+            animator.SetTrigger(activateTriggerName);
+        }
+
+        // 2. Проигрываем первый звук и ждем окончания его длительности
+        if (firstSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(firstSound);
+            yield return new WaitForSeconds(firstSound.length);
+        }
+
+        // 3. Проигрываем второй звук и ждем окончания его длительности
+        if (secondSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(secondSound);
+            yield return new WaitForSeconds(secondSound.length);
+        }
+
+        // 4. Уничтожаем объект после того, как проиграли оба звука (если включено)
         if (destroyAfterUse)
-            Destroy(gameObject, animationDuration);
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void ApplyModifier(PlayerStats stats, PlayerModifier modifier)
