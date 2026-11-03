@@ -111,6 +111,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RandomModifierPickup
   modifiers:
   - {fileID: 11400000, guid: b7358033a41128949ab3ae4341dc5e47, type: 2}
+  - {fileID: 11400000, guid: f32345382369ad54ebc3b74646d0d68d, type: 2}
+  - {fileID: 11400000, guid: b7358033a41128949ab3ae4341dc5e47, type: 2}
+  - {fileID: 11400000, guid: b7358033a41128949ab3ae4341dc5e47, type: 2}
   destroyAfterUse: 0
   notification: {fileID: 0}
   animator: {fileID: 2472975333243895101}

@@ -23,8 +23,8 @@ MonoBehaviour:
   accentColor: {r: 1, g: 1, b: 1, a: 1}
   frame: {fileID: -1258723228921493665, guid: 5a5cce22901a9724eb12dcbfdb29532b, type: 3}
   parent: {fileID: 11400000, guid: 8c24a284482a1e1478e6de4dc1c05cc9, type: 2}
-  treePosition: {x: 480, y: -80}
-  killCost: 100
+  treePosition: {x: 480, y: -0}
+  killCost: 500
   startingSkill: 0
   bonusType: 1
   bonusValue: 30

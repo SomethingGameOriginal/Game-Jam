@@ -5,7 +5,9 @@ public enum SkillBonusType
     MoveSpeed,
     MaxHealth,
     Damage,
-    DamageBlockChance
+    DamageBlockChance,
+    InfectionSlow,      // ← НОВОЕ: замедление заражения (множитель)
+    StartingTime        // ← НОВОЕ: +секунды к стартовому времени
 }
 
 [CreateAssetMenu(menuName = "Skills/Skill")]

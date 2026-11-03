@@ -515,7 +515,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: f751a2b05bb0a3c4bbe2ccb1bdb77eb6, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.684
+  m_Volume: 0.426
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -818,9 +818,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6103ff4841f5bda46821ff53d9a594ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameTimer
-  startTime: 300
+  startTime: 360
   timerText: {fileID: 326615293}
   playerDeath: {fileID: 1997743367}
+  debug: 0
+  Use: 0
 --- !u!114 &326615293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1058,6 +1060,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 229887120346295514, guid: efe2efb12b7626f4dbda303637bad339, type: 3}
+      propertyPath: skills.Array.size
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 229887120346295514, guid: efe2efb12b7626f4dbda303637bad339, type: 3}
+      propertyPath: 'skills.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: ee27dbd5e270b054190002d66aef2536, type: 2}
+    - target: {fileID: 229887120346295514, guid: efe2efb12b7626f4dbda303637bad339, type: 3}
+      propertyPath: 'skills.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 230c10323bebdfa4dbaad3e13ac4253c, type: 2}
+    - target: {fileID: 229887120346295514, guid: efe2efb12b7626f4dbda303637bad339, type: 3}
+      propertyPath: 'skills.Array.data[9]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1c85fa406be94014fbb7926a04bcfebe, type: 2}
+    - target: {fileID: 229887120346295514, guid: efe2efb12b7626f4dbda303637bad339, type: 3}
+      propertyPath: 'skills.Array.data[10]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 4dd9fa987dab2dc469e55e0ee17a28e3, type: 2}
+    - target: {fileID: 229887120346295514, guid: efe2efb12b7626f4dbda303637bad339, type: 3}
+      propertyPath: 'skills.Array.data[11]'
+      value: 
+      objectReference: {fileID: 11400000, guid: d2302b923e66b9b4fbf348cdc8bab9b4, type: 2}
     - target: {fileID: 2196614364482997098, guid: efe2efb12b7626f4dbda303637bad339, type: 3}
       propertyPath: m_LocalPosition.x
       value: 146.44531
@@ -1143,8 +1169,8 @@ MonoBehaviour:
   - {fileID: 42638182037961768, guid: 798ea322d07eb334497252ea2b75f071, type: 3}
   BossLocation: {fileID: 3225445978946618291, guid: 8a757b2a78f8bcc419dee80d7ce3988a, type: 3}
   roomCount: 20
-  roomLength: 60
-  prefabLength: 60
+  roomLength: 31
+  prefabLength: 31
   generatedParent: {fileID: 403549570}
   yawJitter: 0
 --- !u!4 &403549570
@@ -3609,7 +3635,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: b8a21f560af301448a48d6b8e9dec8c7, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.212
+  m_Volume: 0.126
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -4182,7 +4208,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3335231120518448135, guid: 2f738c1466a3c4848969d8a1181ae646, type: 3}
       propertyPath: m_Size.y
-      value: 1.4519868
+      value: 1.6359351
       objectReference: {fileID: 0}
     - target: {fileID: 3335231120518448135, guid: 2f738c1466a3c4848969d8a1181ae646, type: 3}
       propertyPath: m_Offset.x
@@ -4190,7 +4216,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3335231120518448135, guid: 2f738c1466a3c4848969d8a1181ae646, type: 3}
       propertyPath: m_Offset.y
-      value: -0.13606882
+      value: -0.22804296
       objectReference: {fileID: 0}
     - target: {fileID: 5989536470467667912, guid: 2f738c1466a3c4848969d8a1181ae646, type: 3}
       propertyPath: firstSound
@@ -5473,7 +5499,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8186989651966093499, guid: 333b9a36dc1c0cc4fa458bcec15f1bed, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12754,6 +12780,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartTitries
   Titrri: {fileID: 1144910140}
+  musik: {fileID: 240717208}
 --- !u!1 &2018448562
 GameObject:
   m_ObjectHideFlags: 0

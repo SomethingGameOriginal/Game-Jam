@@ -27,7 +27,7 @@ public class CreditsTrigger : MonoBehaviour
 
         // Показываем титры
         if (creditsPanel != null)
-            creditsPanel.SetActive(true);
+            creditsPanel.SetActive(false);
 
         Cursor.lockState = CursorLockMode.None;
     }

@@ -21,11 +21,11 @@ public class Boss2D : EnemyChase2D
     [SerializeField, Min(0f)] private float projectileSpeed = 8f;
     [SerializeField, Min(0f)] private float projectileDamage = 10f;
 
-    [Tooltip("Число снарядов в каждом из трёх направлений.")]
-    [SerializeField, Min(1)] private int countOfBullet = 5;
+    [Tooltip("Сколько пуль разлетается по кругу за один залп.")]
+    [SerializeField, Min(1)] private int radialCount = 12;
 
-    [SerializeField, Range(0f, 45f)] private float sideShotAngle = 12f;
-    [SerializeField, Min(0f)] private float timeBetweenShots = 0.12f;
+    [Tooltip("Задержка между соседними пулями залпа. 0 — все одновременно.")]
+    [SerializeField, Min(0f)] private float timeBetweenShots = 0.05f;
 
     private float attackTimer;
     private bool isAttacking;
@@ -38,8 +38,7 @@ public class Boss2D : EnemyChase2D
         if (stompRadiusVisual != null)
         {
             stompRadiusVisual.SetActive(false);
-            stompRadiusVisual.transform.localScale =
-                Vector3.one * stompRadius * 2f;
+            stompRadiusVisual.transform.localScale = Vector3.one * stompRadius;
         }
 
         attackTimer = timeBetweenAttacks;
@@ -63,14 +62,17 @@ public class Boss2D : EnemyChase2D
 
     protected override void FixedUpdate()
     {
-        // Базовый FixedUpdate управляет поиском/преследованием и вызывает
-        // OnPlayerVisible(), который мы переопределили выше.
         base.FixedUpdate();
 
         if (isAttacking || !HasPlayer)
             return;
 
         float distance = Vector2.Distance(rb.position, PlayerPosition);
+
+        // ⬇️ КЛЮЧЕВОЕ: пока игрок в радиусе атаки — жёстко стоим.
+        // Это перекрывает любое движение, которое мог задать базовый FixedUpdate.
+        if (distance <= attackRange)
+            StopMoving();
 
         if (distance > attackRange)
             return;
@@ -102,26 +104,28 @@ public class Boss2D : EnemyChase2D
 
         yield return new WaitForSeconds(stompWindup);
 
+
         Collider2D[] targets = Physics2D.OverlapCircleAll(
             rb.position,
             stompRadius,
             stompTargetLayer
         );
 
-        HashSet<PlayerStats> damagedPlayers = new HashSet<PlayerStats>();
+        Debug.Log(targets);
+
+        //HashSet<PlayerStats> damagedPlayers = new HashSet<PlayerStats>();
+
+        Debug.Log($"targets.Length = {targets.Length}, radius = {stompRadius}, layerMask = {stompTargetLayer.value}");
 
         foreach (Collider2D target in targets)
         {
-            if (target == null ||
-                target.transform == transform ||
-                target.transform.IsChildOf(transform))
-            {
-                continue;
-            }
+            Debug.Log("50 ehjyf");
 
-            PlayerStats stats = target.GetComponentInParent<PlayerStats>();
+            PlayerStats stats = target.GetComponent<PlayerStats>();
 
-            if (stats != null && damagedPlayers.Add(stats))
+            Debug.Log("50 ehjyf");
+
+            if (stats != null)
                 stats.TakeDamage(Mathf.RoundToInt(stompDamage));
         }
 
@@ -136,7 +140,7 @@ public class Boss2D : EnemyChase2D
         isAttacking = true;
         StopMoving();
 
-        if (player == null || projectilePrefab == null || countOfBullet <= 0)
+        if (projectilePrefab == null || radialCount <= 0)
         {
             isAttacking = false;
             yield break;
@@ -144,33 +148,21 @@ public class Boss2D : EnemyChase2D
 
         Transform origin = firePoint != null ? firePoint : transform;
 
-        Vector2 toPlayer =
-            (Vector2)player.position - (Vector2)origin.position;
+        // Равномерно распределяем пули по кругу.
+        float step = 360f / radialCount;
 
-        if (toPlayer.sqrMagnitude < 0.001f)
+        for (int i = 0; i < radialCount; i++)
         {
-            isAttacking = false;
-            yield break;
-        }
+            float angle = i * step;
+            Vector2 direction = new Vector2(
+                Mathf.Cos(angle * Mathf.Deg2Rad),
+                Mathf.Sin(angle * Mathf.Deg2Rad)
+            );
 
-        Vector2 centerDirection = toPlayer.normalized;
+            SpawnProjectile(origin, direction);
 
-        float[] angles = { 0f, -sideShotAngle, sideShotAngle };
-
-        foreach (float angle in angles)
-        {
-            Vector2 direction = Rotate(centerDirection, angle);
-
-            for (int i = 0; i < countOfBullet; i++)
-            {
-                if (player == null)
-                    break;
-
-                SpawnProjectile(origin, direction);
-
-                if (i < countOfBullet - 1)
-                    yield return new WaitForSeconds(timeBetweenShots);
-            }
+            if (timeBetweenShots > 0f && i < radialCount - 1)
+                yield return new WaitForSeconds(timeBetweenShots);
         }
 
         isAttacking = false;

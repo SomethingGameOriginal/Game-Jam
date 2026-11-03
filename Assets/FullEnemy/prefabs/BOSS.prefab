@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8307202945356628532}
   m_Layer: 9
   m_Name: BOSS
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 16.2288, y: -0.9712, z: 0}
-  m_LocalScale: {x: 3.0577, y: 3.0577, z: 3.0577}
+  m_LocalScale: {x: 2, y: 2, z: 3.0577}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6706404417392396541}
@@ -219,7 +219,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Boss2D
   player: {fileID: 0}
-  moveSpeed: 3
+  moveSpeed: 4
   maxHealth: 3
   playerLayer:
     serializedVersion: 2
@@ -242,8 +242,8 @@ MonoBehaviour:
   showGizmos: 1
   attackRange: 5
   timeBetweenAttacks: 0.5
-  stompRadius: 2
-  stompDamage: 20
+  stompRadius: 6
+  stompDamage: 40
   stompWindup: 0.7
   stompTargetLayer:
     serializedVersion: 2
@@ -251,10 +251,9 @@ MonoBehaviour:
   stompRadiusVisual: {fileID: 2402137791327443776}
   projectilePrefab: {fileID: 2455825155569105996, guid: b17e5c8b8e5a9e1439a4f8162960e29c, type: 3}
   firePoint: {fileID: 0}
-  projectileSpeed: 8
-  projectileDamage: 10
-  countOfBullet: 5
-  sideShotAngle: 12
+  projectileSpeed: 14
+  projectileDamage: 15
+  radialCount: 20
   timeBetweenShots: 0.12
 --- !u!1 &2402137791327443776
 GameObject:
@@ -283,7 +282,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.02, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 400375825168191173}
