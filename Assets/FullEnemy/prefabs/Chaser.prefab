@@ -228,7 +228,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 79943b47dccd97d49b0792dffc803c6b, type: 3}
   - {fileID: 8300000, guid: 5b84b7889b157134cb9e836afa5b7822, type: 3}
   - {fileID: 8300000, guid: 788f09091c7869b4685d492a282def0e, type: 3}
-  deathSounds: []
+  deathSounds:
+  - {fileID: 8300000, guid: 7b6579ec47b6c8d4b9db6ac45216c78f, type: 3}
+  - {fileID: 8300000, guid: e58dc2ac8270cc54f90bd609ed933e77, type: 3}
+  - {fileID: 8300000, guid: 94ec1ddf8e03f5b46806681ecbb8b1ec, type: 3}
 --- !u!58 &2444795317109325160
 CircleCollider2D:
   m_ObjectHideFlags: 0

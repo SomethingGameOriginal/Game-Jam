@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class RangedEnemy : EnemyChase2D
@@ -15,7 +16,6 @@ public class RangedEnemy : EnemyChase2D
     [SerializeField] private int projectileDamage = 1;
 
     [Header("Препятствия для выстрела")]
-    [Tooltip("Слои стен/препятствий. Должно быть НЕ пусто, иначе HasClearShot всегда false.")]
     [SerializeField] private LayerMask shootObstacleLayers;
 
     [Header("Анимация")]
@@ -24,14 +24,34 @@ public class RangedEnemy : EnemyChase2D
     [SerializeField] private string attackTriggerName = "Attack";
 
     [Header("Поворот спрайта")]
-    [Tooltip("Компонент SpriteRenderer, который нужно переворачивать.")]
     [SerializeField] private SpriteRenderer spriteRenderer;
-    [Tooltip("Поставь галочку, если спрайт по умолчанию смотрит ВЛЕВО.")]
     [SerializeField] private bool spriteFacesLeftByDefault = false;
 
-    private float fireTimer;
+    [Header("Звуки")]
+    [SerializeField] private AudioSource audioSource;
 
-    // Хэши для оптимизации Animator
+    [Header("Ходьба")]
+    [SerializeField] private AudioClip[] walkSounds;
+    [SerializeField] private float walkSoundInterval = 0.4f;
+
+    [Header("Атака")]
+    [SerializeField] private AudioClip[] attackSounds;
+
+    [Header("Получение урона")]
+    [SerializeField] private AudioClip[] damageSounds;
+
+    [Header("Смерть")]
+    [SerializeField] private AudioClip[] deathSounds;
+
+    [Header("Случайные крики")]
+    [SerializeField] private AudioClip[] screamSounds;
+    [SerializeField] private float minScreamInterval = 20f;
+    [SerializeField] private float maxScreamInterval = 60f;
+
+    private float fireTimer;
+    private float walkSoundTimer;
+    private float screamTimer;
+
     private int moveBoolHash;
     private int attackTriggerHash;
 
@@ -39,26 +59,34 @@ public class RangedEnemy : EnemyChase2D
     {
         base.Awake();
 
-        // Инициализация хэшей аниматора
         moveBoolHash = Animator.StringToHash(moveBoolName);
         attackTriggerHash = Animator.StringToHash(attackTriggerName);
 
-        // Автопоиск компонентов, если не назначены
         if (animator == null)
             animator = GetComponent<Animator>();
 
         if (spriteRenderer == null)
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+
+        screamTimer = GetRandomScreamInterval();
     }
 
     protected override void FixedUpdate()
     {
+        if (IsDead)
+            return;
+
+        UpdateScream();
+
         bool seeing = FindPlayer();
 
         if (!seeing)
         {
             StopMoving();
-            UpdateAnimations(false); // Стоим
+            UpdateAnimations(false);
             return;
         }
 
@@ -82,10 +110,8 @@ public class RangedEnemy : EnemyChase2D
         bool hasShot = HasClearShot(out Vector2 shotDir);
         bool isMoving = false;
 
-        // --- Поворот в сторону игрока ---
         FacePlayer(playerPos.x);
 
-        // --- Движение ---
         if (distance > desiredDistance + distanceTolerance)
         {
             MoveInDirection(GetMoveDirection(playerPos));
@@ -108,7 +134,6 @@ public class RangedEnemy : EnemyChase2D
 
         UpdateAnimations(isMoving);
 
-        // --- Стрельба ---
         if (hasShot)
         {
             if (fireTimer > 0f)
@@ -126,24 +151,93 @@ public class RangedEnemy : EnemyChase2D
         }
     }
 
-    // Поворот спрайта в сторону игрока (только по X)
     private void FacePlayer(float playerX)
     {
-        if (spriteRenderer == null) return;
+        if (spriteRenderer == null)
+            return;
 
         bool playerIsRight = playerX > transform.position.x;
 
-        // Если спрайт по умолчанию смотрит вправо:
-        // playerIsRight = true  -> flipX = false
-        // playerIsRight = false -> flipX = true
-        // Если по умолчанию влево — инвертируем.
-        spriteRenderer.flipX = !spriteFacesLeftByDefault ? playerIsRight : !playerIsRight;
+        spriteRenderer.flipX = !spriteFacesLeftByDefault
+            ? playerIsRight
+            : !playerIsRight;
     }
 
     private void UpdateAnimations(bool isMoving)
     {
         if (animator != null)
             animator.SetBool(moveBoolHash, isMoving);
+
+        UpdateWalkSound(isMoving);
+    }
+
+    private void UpdateWalkSound(bool isMoving)
+    {
+        if (!isMoving)
+        {
+            walkSoundTimer = 0f;
+            return;
+        }
+
+        walkSoundTimer -= Time.fixedDeltaTime;
+
+        if (walkSoundTimer <= 0f)
+        {
+            PlayRandomSound(walkSounds);
+            walkSoundTimer = Mathf.Max(0.05f, walkSoundInterval);
+        }
+    }
+
+    private void UpdateScream()
+    {
+        if (screamSounds == null || screamSounds.Length == 0)
+            return;
+
+        screamTimer -= Time.fixedDeltaTime;
+
+        if (screamTimer <= 0f)
+        {
+            PlayRandomSound(screamSounds);
+            screamTimer = GetRandomScreamInterval();
+        }
+    }
+
+    private float GetRandomScreamInterval()
+    {
+        float min = Mathf.Max(0f, minScreamInterval);
+        float max = Mathf.Max(min, maxScreamInterval);
+
+        return Random.Range(min, max);
+    }
+
+    private void PlayRandomSound(AudioClip[] sounds)
+    {
+        if (audioSource == null || sounds == null || sounds.Length == 0)
+            return;
+
+        AudioClip clip = sounds[Random.Range(0, sounds.Length)];
+
+        if (clip != null)
+            audioSource.PlayOneShot(clip);
+    }
+
+    protected override void OnDamaged()
+    {
+        PlayRandomSound(damageSounds);
+    }
+
+    protected override float OnDeath()
+    {
+        if (audioSource == null || deathSounds == null || deathSounds.Length == 0)
+            return 0f;
+
+        AudioClip clip = deathSounds[Random.Range(0, deathSounds.Length)];
+
+        if (clip == null)
+            return 0f;
+
+        audioSource.PlayOneShot(clip);
+        return clip.length;
     }
 
     private bool HasClearShot(out Vector2 direction)
@@ -201,12 +295,18 @@ public class RangedEnemy : EnemyChase2D
     {
         if (projectilePrefab == null || firePoint == null)
         {
-            Debug.LogWarning($"[RangedEnemy] Не назначен {(projectilePrefab == null ? "Projectile Prefab" : "Fire Point")} на {name}", this);
+            Debug.LogWarning(
+                $"[RangedEnemy] Не назначен {(projectilePrefab == null ? "Projectile Prefab" : "Fire Point")} на {name}",
+                this
+            );
+
             return;
         }
 
         if (animator != null)
             animator.SetTrigger(attackTriggerHash);
+
+        PlayRandomSound(attackSounds);
 
         GameObject projectile = Instantiate(
             projectilePrefab,

@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class SniperEnemy : EnemyChase2D
@@ -20,19 +21,33 @@ public class SniperEnemy : EnemyChase2D
     [SerializeField] private string attackTriggerName = "Attack";
 
     [Header("Тело")]
-    [Tooltip("SpriteRenderer ТЕЛА (не оружия!). Перетащи вручную, чтобы не путаться.")]
     [SerializeField] private SpriteRenderer bodySpriteRenderer;
     [SerializeField] private bool bodyFacesLeftByDefault = false;
 
     [Header("Оружие")]
-    [Tooltip("Пустой объект-пивот, вращается через rotation. Спрайт винтовки — его дочерний объект.")]
     [SerializeField] private Transform weaponPivot;
-    [Tooltip("SpriteRenderer САМОЙ ВИНТОВКИ (для flipY, чтобы не была вверх ногами).")]
     [SerializeField] private SpriteRenderer weaponSpriteRenderer;
-    [Tooltip("Смещение угла, если ствол нарисован не вдоль +X.")]
     [SerializeField] private float weaponAngleOffset = 0f;
 
+    [Header("Звуки")]
+    [SerializeField] private AudioSource audioSource;
+
+    [Header("Ходьба")]
+    [SerializeField] private AudioClip[] walkSounds;
+    [SerializeField] private float walkSoundInterval = 0.4f;
+
+    [Header("Выстрел")]
+    [SerializeField] private AudioClip[] attackSounds;
+
+    [Header("Получение урона")]
+    [SerializeField] private AudioClip[] damageSounds;
+
+    [Header("Смерть")]
+    [SerializeField] private AudioClip[] deathSounds;
+
     private float fireTimer;
+    private float walkSoundTimer;
+
     private int moveBoolHash;
     private int attackTriggerHash;
 
@@ -52,16 +67,27 @@ public class SniperEnemy : EnemyChase2D
         if (weaponPivot == null)
         {
             Transform found = transform.Find("WeaponPivot");
-            if (found == null) found = transform.Find("Weapon");
-            if (found != null) weaponPivot = found;
+
+            if (found == null)
+                found = transform.Find("Weapon");
+
+            if (found != null)
+                weaponPivot = found;
         }
 
         if (weaponSpriteRenderer == null && weaponPivot != null)
-            weaponSpriteRenderer = weaponPivot.GetComponentInChildren<SpriteRenderer>();
+            weaponSpriteRenderer =
+                weaponPivot.GetComponentInChildren<SpriteRenderer>();
+
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
     }
 
     protected override void FixedUpdate()
     {
+        if (IsDead)
+            return;
+
         bool seeing = FindPlayer();
 
         if (!seeing)
@@ -77,7 +103,7 @@ public class SniperEnemy : EnemyChase2D
 
     protected override void OnPlayerVisible()
     {
-        if (player == null)
+        if (player == null || IsDead)
         {
             StopMoving();
             UpdateAnimations(false);
@@ -87,17 +113,20 @@ public class SniperEnemy : EnemyChase2D
         Vector2 playerPos = player.position;
         Vector2 toPlayer = playerPos - rb.position;
         float distance = toPlayer.magnitude;
+
         bool hasShot = HasClearShot(out Vector2 shotDirection);
         bool isMoving = false;
 
-        // --- Поворот тела и оружия ---
+        // Поворот тела и оружия.
         FacePlayer(playerPos.x);
         AimWeapon(playerPos);
 
-        // --- Движение ---
+        // Движение.
         if (distance < minDistance)
         {
-            Vector2 retreatTarget = rb.position - toPlayer.normalized * 3f;
+            Vector2 retreatTarget =
+                rb.position - toPlayer.normalized * 3f;
+
             MoveInDirection(GetDirectionTo(retreatTarget));
             isMoving = true;
         }
@@ -108,7 +137,9 @@ public class SniperEnemy : EnemyChase2D
         }
         else if (distance < preferredDistance - 0.5f)
         {
-            Vector2 retreatTarget = rb.position - toPlayer.normalized * 2f;
+            Vector2 retreatTarget =
+                rb.position - toPlayer.normalized * 2f;
+
             MoveInDirection(GetDirectionTo(retreatTarget));
             isMoving = true;
         }
@@ -119,7 +150,7 @@ public class SniperEnemy : EnemyChase2D
 
         UpdateAnimations(isMoving);
 
-        // --- Стрельба ---
+        // Стрельба.
         if (hasShot)
         {
             if (fireTimer > 0f)
@@ -128,7 +159,9 @@ public class SniperEnemy : EnemyChase2D
             if (fireTimer <= 0f)
             {
                 Shoot(shotDirection);
-                fireTimer = 1f / Mathf.Max(0.01f, fireRate);
+
+                fireTimer = 1f /
+                    Mathf.Max(0.01f, fireRate);
             }
         }
         else
@@ -137,58 +170,130 @@ public class SniperEnemy : EnemyChase2D
         }
     }
 
-    // Переворот ТЕЛА
     private void FacePlayer(float playerX)
     {
-        if (bodySpriteRenderer == null) return;
+        if (bodySpriteRenderer == null)
+            return;
 
         bool playerIsRight = playerX > transform.position.x;
-        bodySpriteRenderer.flipX = !bodyFacesLeftByDefault ? playerIsRight : !playerIsRight;
+
+        bodySpriteRenderer.flipX =
+            !bodyFacesLeftByDefault
+                ? playerIsRight
+                : !playerIsRight;
     }
 
-    // Поворот ОРУЖИЯ к игроку (старая логика)
     private void AimWeapon(Vector2 playerPos)
     {
-        if (weaponPivot == null) return;
+        if (weaponPivot == null)
+            return;
 
         Vector2 origin = weaponPivot.position;
         Vector2 direction = playerPos - origin;
 
-        if (direction.sqrMagnitude < 0.0001f) return;
+        if (direction.sqrMagnitude < 0.0001f)
+            return;
 
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + weaponAngleOffset;
+        float angle =
+            Mathf.Atan2(direction.y, direction.x) *
+            Mathf.Rad2Deg + weaponAngleOffset;
 
         bool facingLeft = playerPos.x < transform.position.x;
 
         if (facingLeft)
         {
             angle += 180f;
+
             if (weaponSpriteRenderer != null)
             {
-                weaponSpriteRenderer.flipX = true;   // зеркалим по X
-                weaponSpriteRenderer.flipY = false;  // по Y не нужно
+                weaponSpriteRenderer.flipX = true;
+                weaponSpriteRenderer.flipY = false;
             }
         }
         else
         {
             if (weaponSpriteRenderer != null)
             {
-                weaponSpriteRenderer.flipX = false;  // ствол справа — не переворачиваем
+                weaponSpriteRenderer.flipX = false;
                 weaponSpriteRenderer.flipY = false;
             }
         }
 
-        weaponPivot.rotation = Quaternion.Euler(0f, 0f, angle);
+        weaponPivot.rotation =
+            Quaternion.Euler(0f, 0f, angle);
     }
 
     private void UpdateAnimations(bool isMoving)
     {
         if (animator != null)
             animator.SetBool(moveBoolHash, isMoving);
+
+        UpdateWalkSound(isMoving);
+    }
+
+    private void UpdateWalkSound(bool isMoving)
+    {
+        if (!isMoving)
+        {
+            walkSoundTimer = 0f;
+            return;
+        }
+
+        walkSoundTimer -= Time.fixedDeltaTime;
+
+        if (walkSoundTimer <= 0f)
+        {
+            PlayRandomSound(walkSounds);
+
+            walkSoundTimer =
+                Mathf.Max(0.05f, walkSoundInterval);
+        }
+    }
+
+    private void PlayRandomSound(AudioClip[] sounds)
+    {
+        if (audioSource == null ||
+            sounds == null ||
+            sounds.Length == 0)
+            return;
+
+        AudioClip clip =
+            sounds[Random.Range(0, sounds.Length)];
+
+        if (clip != null)
+            audioSource.PlayOneShot(clip);
+    }
+
+    protected override void OnDamaged()
+    {
+        PlayRandomSound(damageSounds);
+    }
+
+    protected override float OnDeath()
+    {
+        if (audioSource == null ||
+            deathSounds == null ||
+            deathSounds.Length == 0)
+            return 0f;
+
+        AudioClip clip =
+            deathSounds[Random.Range(0, deathSounds.Length)];
+
+        if (clip == null)
+            return 0f;
+
+        audioSource.PlayOneShot(clip);
+
+        return clip.length;
     }
 
     private bool HasClearShot(out Vector2 direction)
     {
+        direction = Vector2.zero;
+
+        if (player == null)
+            return false;
+
         Vector2 origin = firePoint != null
             ? (Vector2)firePoint.position
             : rb.position;
@@ -196,10 +301,7 @@ public class SniperEnemy : EnemyChase2D
         Vector2 offset = (Vector2)player.position - origin;
 
         if (offset.sqrMagnitude < 0.001f)
-        {
-            direction = Vector2.zero;
             return false;
-        }
 
         direction = offset.normalized;
 
@@ -220,7 +322,12 @@ public class SniperEnemy : EnemyChase2D
 
             Transform hitTransform = hit.collider.transform;
 
-            if (hitTransform == transform || hitTransform.IsChildOf(transform))
+            if (hitTransform == transform ||
+                hitTransform.IsChildOf(transform))
+                continue;
+
+            if (hitTransform == player ||
+                hitTransform.IsChildOf(player))
                 continue;
 
             return false;
@@ -237,20 +344,31 @@ public class SniperEnemy : EnemyChase2D
         if (animator != null)
             animator.SetTrigger(attackTriggerHash);
 
+        PlayRandomSound(attackSounds);
+
         GameObject projectile = Instantiate(
             projectilePrefab,
             firePoint.position,
             Quaternion.identity
         );
 
-        EnemyProjectile bullet = projectile.GetComponent<EnemyProjectile>();
+        EnemyProjectile bullet =
+            projectile.GetComponent<EnemyProjectile>();
 
         if (bullet != null)
-            bullet.Launch(direction, projectileSpeed, projectileDamage);
+        {
+            bullet.Launch(
+                direction,
+                projectileSpeed,
+                projectileDamage
+            );
+        }
         else
+        {
             Debug.LogError(
                 "На Projectile Prefab отсутствует EnemyProjectile",
                 projectile
             );
+        }
     }
 }

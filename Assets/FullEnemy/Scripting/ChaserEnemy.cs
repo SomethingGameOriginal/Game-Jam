@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class ChaserEnemy : EnemyChase2D
@@ -20,17 +21,6 @@ public class ChaserEnemy : EnemyChase2D
     [SerializeField] private string moveBoolName = "isMoving";
     [SerializeField] private string attackTriggerName = "Attack";
 
-    private Vector2 previousPlayerPosition;
-    private Vector2 rushTarget;
-    private float rushTimer;
-    private float rushCooldownTimer;
-    private float attackTimer;
-    private float normalSpeed;
-
-    // Хэши для оптимизации Animator
-    private int moveBoolHash;
-    private int attackTriggerHash;
-
     [Header("Звуки")]
     [SerializeField] private AudioSource audioSource;
 
@@ -47,24 +37,43 @@ public class ChaserEnemy : EnemyChase2D
     [Header("Смерть")]
     [SerializeField] private AudioClip[] deathSounds;
 
+    private Vector2 previousPlayerPosition;
+    private Vector2 rushTarget;
+
+    private float rushTimer;
+    private float rushCooldownTimer;
+    private float attackTimer;
+    private float normalSpeed;
     private float walkSoundTimer;
+
+    private int moveBoolHash;
+    private int attackTriggerHash;
+
     protected override void Awake()
     {
         base.Awake();
+
         normalSpeed = moveSpeed;
 
-        // Инициализация хэшей аниматора
         moveBoolHash = Animator.StringToHash(moveBoolName);
         attackTriggerHash = Animator.StringToHash(attackTriggerName);
 
-        // Если animator не назначен в инспекторе, попробуем найти его на объекте
         if (animator == null)
             animator = GetComponent<Animator>();
+
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
     }
 
     protected override void FixedUpdate()
     {
+        if (IsDead)
+            return;
+
         base.FixedUpdate();
+
+        if (IsDead)
+            return;
 
         attackTimer -= Time.fixedDeltaTime;
         rushCooldownTimer -= Time.fixedDeltaTime;
@@ -73,11 +82,10 @@ public class ChaserEnemy : EnemyChase2D
         {
             moveSpeed = normalSpeed;
             StopMoving();
-            UpdateAnimations(false); // Стоим
+            UpdateAnimations(false);
             return;
         }
 
-        // Логика рывка
         if (rushTimer > 0f)
         {
             rushTimer -= Time.fixedDeltaTime;
@@ -86,11 +94,13 @@ public class ChaserEnemy : EnemyChase2D
             if (Vector2.Distance(rb.position, rushTarget) <= stopDistance)
             {
                 rushTimer = 0f;
+                StopMoving();
+                UpdateAnimations(false);
             }
             else
             {
                 MoveInDirection(GetDirectionTo(rushTarget));
-                UpdateAnimations(true); // Двигаемся во время рывка
+                UpdateAnimations(true);
             }
 
             if (rushTimer <= 0f)
@@ -101,7 +111,6 @@ public class ChaserEnemy : EnemyChase2D
 
         moveSpeed = normalSpeed;
 
-        // Рывок к позиции, где игрок был в предыдущем физическом кадре.
         if (rushCooldownTimer <= 0f &&
             Random.value < rushChance * Time.fixedDeltaTime)
         {
@@ -118,33 +127,21 @@ public class ChaserEnemy : EnemyChase2D
         if (distance > stopDistance)
         {
             MoveInDirection(GetMoveDirection(PlayerPosition));
-            UpdateAnimations(true); // Двигаемся к игроку
+            UpdateAnimations(true);
         }
         else
         {
             StopMoving();
-            UpdateAnimations(false); // Стоим рядом
+            UpdateAnimations(false);
         }
     }
 
-    // Метод для управления анимацией движения
     private void UpdateAnimations(bool isMoving)
     {
         if (animator != null)
             animator.SetBool(moveBoolHash, isMoving);
 
         UpdateWalkSound(isMoving);
-    }
-
-    private void PlayRandomSound(AudioClip[] sounds)
-    {
-        if (audioSource == null || sounds.Length == 0)
-            return;
-
-        AudioClip clip = sounds[Random.Range(0, sounds.Length)];
-
-        if (clip != null)
-            audioSource.PlayOneShot(clip);
     }
 
     private void UpdateWalkSound(bool isMoving)
@@ -160,8 +157,43 @@ public class ChaserEnemy : EnemyChase2D
         if (walkSoundTimer <= 0f)
         {
             PlayRandomSound(walkSounds);
-            walkSoundTimer = walkSoundInterval;
+            walkSoundTimer = Mathf.Max(0.05f, walkSoundInterval);
         }
+    }
+
+    private void PlayRandomSound(AudioClip[] sounds)
+    {
+        if (audioSource == null || sounds == null || sounds.Length == 0)
+            return;
+
+        AudioClip clip = sounds[Random.Range(0, sounds.Length)];
+
+        if (clip != null)
+            audioSource.PlayOneShot(clip);
+    }
+
+    protected override void OnDamaged()
+    {
+        PlayRandomSound(damageSounds);
+    }
+
+    protected override float OnDeath()
+    {
+        return PlayDeathSound();
+    }
+
+    private float PlayDeathSound()
+    {
+        if (audioSource == null || deathSounds == null || deathSounds.Length == 0)
+            return 0f;
+
+        AudioClip clip = deathSounds[Random.Range(0, deathSounds.Length)];
+
+        if (clip == null)
+            return 0f;
+
+        audioSource.PlayOneShot(clip);
+        return clip.length;
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -176,7 +208,7 @@ public class ChaserEnemy : EnemyChase2D
 
     private void TryDamagePlayer(Collider2D other)
     {
-        if (attackTimer > 0f)
+        if (IsDead || attackTimer > 0f)
             return;
 
         PlayerStats stats = other.GetComponentInParent<PlayerStats>();
@@ -184,15 +216,13 @@ public class ChaserEnemy : EnemyChase2D
         if (stats == null)
             return;
 
-        // Наносим урон
         stats.TakeDamage(contactDamage);
+
         PlayRandomSound(attackSounds);
 
-        // Запускаем триггер анимации атаки
         if (animator != null)
             animator.SetTrigger(attackTriggerHash);
 
-        // Ставим кулдаун
         attackTimer = attackCooldown;
     }
 }

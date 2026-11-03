@@ -1,9 +1,12 @@
+
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class EnemyChase2D : MonoBehaviour
 {
+    protected bool IsDead { get; private set; }
+
     [Header("Общее")]
     [SerializeField] protected Transform player;
     [SerializeField] protected float moveSpeed = 3f;
@@ -41,6 +44,8 @@ public class EnemyChase2D : MonoBehaviour
     protected bool HasPlayer => player != null;
     protected bool IsSearchingForPlayer => searchTimer > 0f;
 
+    // Доступно дочерним классам
+
     protected Vector2 PlayerPosition =>
         player != null ? (Vector2)player.position : LastKnownPlayerPosition;
 
@@ -56,6 +61,7 @@ public class EnemyChase2D : MonoBehaviour
 
     private readonly List<Vector2> debugBlocked = new();
     private readonly List<Vector2> debugClear = new();
+
     private Vector2 debugDesired;
     private Vector2 debugChosen;
 
@@ -68,6 +74,7 @@ public class EnemyChase2D : MonoBehaviour
         if (player == null)
         {
             GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
             if (playerObject != null)
                 player = playerObject.transform;
         }
@@ -80,6 +87,9 @@ public class EnemyChase2D : MonoBehaviour
 
     protected virtual void FixedUpdate()
     {
+        if (IsDead)
+            return;
+
         UpdateStuckTimer();
 
         bool seeing = FindPlayer();
@@ -87,6 +97,7 @@ public class EnemyChase2D : MonoBehaviour
         if (player == null)
         {
             GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
             if (playerObject != null)
                 player = playerObject.transform;
         }
@@ -100,7 +111,6 @@ public class EnemyChase2D : MonoBehaviour
             return;
         }
 
-        // Только что потеряли игрока — запускаем поиск один раз
         if (wasSeeingPlayer)
         {
             searchTimer = searchDuration;
@@ -110,10 +120,6 @@ public class EnemyChase2D : MonoBehaviour
         UpdateSearchMovement();
     }
 
-    /// <summary>
-    /// Что делать, когда игрок виден. Базовая реализация — просто преследование.
-    /// Наследники (например, RangedEnemy) переопределяют под свою тактику.
-    /// </summary>
     protected virtual void OnPlayerVisible()
     {
         MoveInDirection(GetMoveDirection(player.position));
@@ -142,15 +148,12 @@ public class EnemyChase2D : MonoBehaviour
             return false;
 
         PlayerStats stats = hit.GetComponentInParent<PlayerStats>();
+
         player = stats != null ? stats.transform : hit.transform;
 
         return player != null;
     }
 
-    /// <summary>
-    /// Идёт к последней известной позиции игрока после его потери.
-    /// По прибытии некоторое время ищет игрока, затем прекращает движение.
-    /// </summary>
     protected void UpdateSearchMovement()
     {
         if (searchTimer <= 0f)
@@ -171,9 +174,6 @@ public class EnemyChase2D : MonoBehaviour
         searchTimer -= Time.fixedDeltaTime;
     }
 
-    /// <summary>
-    /// Направление к цели с учётом дистанции до союзников и препятствий.
-    /// </summary>
     protected Vector2 GetMoveDirection(Vector2 targetPosition)
     {
         Vector2 toTarget = targetPosition - rb.position;
@@ -190,9 +190,6 @@ public class EnemyChase2D : MonoBehaviour
         return FindDirection(desired);
     }
 
-    /// <summary>
-    /// Направление для отступления от цели с учётом союзников и препятствий.
-    /// </summary>
     protected Vector2 GetRetreatDirection(Vector2 awayFromTarget)
     {
         if (awayFromTarget.sqrMagnitude < 0.001f)
@@ -240,10 +237,6 @@ public class EnemyChase2D : MonoBehaviour
             : Vector2.zero;
     }
 
-    /// <summary>
-    /// Обход препятствий без учёта дистанции до других врагов.
-    /// Оставлен для совместимости с другими дочерними классами.
-    /// </summary>
     protected Vector2 GetDirectionTo(Vector2 target)
     {
         Vector2 offset = target - rb.position;
@@ -271,7 +264,6 @@ public class EnemyChase2D : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
     }
 
-    /// <summary>Выбирает направление движения с обходом препятствий.</summary>
     protected Vector2 FindDirection(Vector2 desired)
     {
         desired = desired.normalized;
@@ -364,23 +356,16 @@ public class EnemyChase2D : MonoBehaviour
             }
         }
 
-        // ⬇️ КЛЮЧЕВОЙ ФИКС: никогда не возвращаем zero, если цель есть.
-        // Иначе враг «умирает» в углу и уже никогда не раздуплится,
-        // т.к. stuck-timer проверяет только движущегося врага.
         if (best == Vector2.zero)
         {
             best = FindLeastBlockedDirection(desired);
-            followingWall = false; // дадим шанс переоценить ситуацию со след. кадра
+            followingWall = false;
         }
 
         debugChosen = best;
         return best;
     }
 
-    /// <summary>
-    /// Аварийный выбор направления: 8 проб, берём то, где просвет до стены наибольший.
-    /// Никогда не возвращает Vector2.zero, если desired ненулевой.
-    /// </summary>
     private Vector2 FindLeastBlockedDirection(Vector2 desired)
     {
         Vector2 bestDir = -desired;
@@ -400,6 +385,7 @@ public class EnemyChase2D : MonoBehaviour
                     wallProbeDistance,
                     obstacleLayer
                 );
+
                 if (hit.collider != null)
                     clearance = hit.distance;
             }
@@ -437,8 +423,6 @@ public class EnemyChase2D : MonoBehaviour
 
         float moved = Vector2.Distance(rb.position, previousPosition);
 
-        // «Хочет двигаться» определяем по lastDirection — он сохраняется,
-        // даже если текущий FindDirection вернул ноль.
         bool wantsToMove = lastDirection.sqrMagnitude > 0.001f;
 
         if (wantsToMove && moved < 0.005f)
@@ -461,19 +445,63 @@ public class EnemyChase2D : MonoBehaviour
         previousPosition = rb.position;
     }
 
+    // События для звуков в дочерних классах.
+
+    protected virtual void OnDamaged()
+    {
+    }
+
+    protected virtual float OnDeath()
+    {
+        return 0f;
+    }
+
     public virtual void TakeDamage(int damage)
     {
+        if (IsDead || damage <= 0)
+            return;
+
         maxHealth -= damage;
 
         if (maxHealth <= 0)
         {
+            IsDead = true;
+
+            StopMoving();
+
+            // Убираем все изображения врага.
+            SpriteRenderer[] sprites =
+                GetComponentsInChildren<SpriteRenderer>(true);
+
+            foreach (SpriteRenderer sprite in sprites)
+                sprite.enabled = false;
+
+            // Отключаем все коллайдеры, включая дочерние.
+            Collider2D[] colliders =
+                GetComponentsInChildren<Collider2D>(true);
+
+            foreach (Collider2D col in colliders)
+                col.enabled = false;
+
             SkillTreeManager.Instance?.RegisterKill();
-            Destroy(gameObject);
+
+            // Проигрываем звук смерти.
+            float deathDuration = OnDeath();
+
+            // Уничтожаем объект после окончания звука.
+            Destroy(gameObject, Mathf.Max(0f, deathDuration));
+        }
+        else
+        {
+            OnDamaged();
         }
     }
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
+        if (IsDead)
+            return;
+
         if (collision.gameObject.CompareTag("Pistol"))
         {
             TakeDamage(10);
@@ -517,26 +545,34 @@ public class EnemyChase2D : MonoBehaviour
             : transform.position;
 
         Gizmos.color = Color.red;
+
         foreach (Vector2 direction in debugBlocked)
+        {
             Gizmos.DrawLine(
                 origin,
                 origin + (Vector3)(direction * obstacleCheckDistance)
             );
+        }
 
         Gizmos.color = Color.green;
+
         foreach (Vector2 direction in debugClear)
+        {
             Gizmos.DrawLine(
                 origin,
                 origin + (Vector3)(direction * obstacleCheckDistance)
             );
+        }
 
         Gizmos.color = Color.yellow;
+
         Gizmos.DrawLine(
             origin,
             origin + (Vector3)(debugDesired * obstacleCheckDistance)
         );
 
         Gizmos.color = Color.magenta;
+
         Gizmos.DrawLine(
             origin,
             origin + (Vector3)(debugChosen * obstacleCheckDistance)
