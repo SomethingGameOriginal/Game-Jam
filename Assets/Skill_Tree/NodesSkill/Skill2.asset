@@ -21,7 +21,7 @@ MonoBehaviour:
   frame: {fileID: -1258723228921493665, guid: 5a5cce22901a9724eb12dcbfdb29532b, type: 3}
   parent: {fileID: 11400000, guid: 37f629073338fc8498ff06f5a9f94cd1, type: 2}
   treePosition: {x: 240, y: -80}
-  killCost: 15
+  killCost: 80
   startingSkill: 0
   bonusType: 1
   bonusValue: 10

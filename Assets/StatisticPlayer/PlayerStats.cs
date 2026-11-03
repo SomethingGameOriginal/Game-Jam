@@ -29,6 +29,7 @@ public class PlayerStats : MonoBehaviour
     // бонусы (кэш)
     private float bonusMaxHealth;
     private float bonusBlockChance;
+    private float bonusInfectionSlow;
 
     public float Infection => infection;
     public bool IsAlive => health > 0f;
@@ -61,7 +62,8 @@ public class PlayerStats : MonoBehaviour
 
         if (debug)
             Debug.Log($"[PlayerStats] Start: maxHealth={currentMaxHealth}, " +
-                      $"blockChance={bonusBlockChance:P0}");
+                      $"blockChance={bonusBlockChance:P0}, " +
+                      $"infectionSlow={bonusInfectionSlow:P0}");
     }
 
     private void OnDestroy()
@@ -78,7 +80,8 @@ public class PlayerStats : MonoBehaviour
 
         if (debug)
             Debug.Log($"[PlayerStats] Skills changed: maxHealth={currentMaxHealth}, " +
-                      $"blockChance={bonusBlockChance:P0}");
+                      $"blockChance={bonusBlockChance:P0}, " +
+                      $"infectionSlow={bonusInfectionSlow:P0}");
     }
 
     private void RefreshBonuses()
@@ -86,6 +89,7 @@ public class PlayerStats : MonoBehaviour
         var mgr = SkillTreeManager.Instance;
         bonusMaxHealth = mgr != null ? mgr.GetBonus(SkillBonusType.MaxHealth) : 0f;
         bonusBlockChance = mgr != null ? mgr.GetBonus(SkillBonusType.DamageBlockChance) : 0f;
+        bonusInfectionSlow = mgr != null ? mgr.GetBonus(SkillBonusType.InfectionSlow) : 0f;
     }
 
     private void RecalculateMaxHealth()
@@ -101,7 +105,8 @@ public class PlayerStats : MonoBehaviour
     {
         if (infection >= 100f)
         {
-            if (playerDeath != null) playerDeath.Die();
+            if (playerDeath != null && !playerDeath.IsDead)
+                playerDeath.Die(DeathCause.Infection, $"{Mathf.CeilToInt(infection)}%");
             return;
         }
 
@@ -110,10 +115,14 @@ public class PlayerStats : MonoBehaviour
 
         infectionTimer += Time.deltaTime;
 
+        // множитель замедления: bonus=0.25 → 0.75 (на 25% медленнее)
+        float infectionMultiplier = Mathf.Clamp(1f - bonusInfectionSlow, 0.05f, 5f);
+
         while (infectionTimer >= secondsPerIncrease && infection < 100f)
         {
             infectionTimer -= secondsPerIncrease;
-            infection = Mathf.Min(100f, infection + infectionIncrease);
+            infection = Mathf.Min(100f,
+                infection + infectionIncrease * infectionMultiplier);
             UpdateUI();
         }
 
@@ -122,7 +131,7 @@ public class PlayerStats : MonoBehaviour
             CanvasTooltip.Show("Теперь вы можете применить способность из-за паразитов, нажав на C, вы ускорите заражение паразитами, но нанесете мощный удар");
         }
 
-        if (infection >= 100f && playerDeath != null)
+        if (infection >= 100f && playerDeath != null && !playerDeath.IsDead)
             playerDeath.Die(DeathCause.Infection, $"{Mathf.CeilToInt(infection)}%");
     }
 
